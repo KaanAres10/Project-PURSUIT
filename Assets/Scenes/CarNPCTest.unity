@@ -287,8 +287,6 @@ GameObject:
   m_Component:
   - component: {fileID: 168119216}
   - component: {fileID: 168119217}
-  - component: {fileID: 168119219}
-  - component: {fileID: 168119218}
   m_Layer: 0
   m_Name: Helicopter
   m_TagString: Untagged
@@ -305,7 +303,7 @@ Transform:
   m_GameObject: {fileID: 168119214}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -3.89, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -328,61 +326,11 @@ MonoBehaviour:
   spotlight: {fileID: 2010943124}
   car: {fileID: 733644666}
   uiFillBar: {fileID: 996129059}
-  requiredTime: 5
+  requiredTime: 6
   obstructionMask:
     serializedVersion: 2
     m_Bits: 512
   uiManager: {fileID: 1507192017}
---- !u!54 &168119218
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 168119214}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
---- !u!136 &168119219
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 168119214}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.7831354
-  m_Height: 3.6280522
-  m_Direction: 2
-  m_Center: {x: -0.0031073093, y: 0.43863618, z: -0.5837703}
 --- !u!1 &181622474
 GameObject:
   m_ObjectHideFlags: 0
@@ -726,7 +674,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d37c2cf88f7c59f4c8cf5d3812568143, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  index: 4
+  index: 1
   origin: {fileID: 0}
 --- !u!1001 &325672453
 PrefabInstance:
@@ -1186,7 +1134,7 @@ Transform:
   m_GameObject: {fileID: 414990007}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2755,7 +2703,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trackerRaw: {fileID: 297146845}
   trackerScaled: {fileID: 937233848}
-  spawnPoint: {fileID: 0}
+  spawnPoint: {fileID: 414990008}
   scaleFactor: 30
   scaleXZOnly: 0
 --- !u!1 &942807115
@@ -2938,6 +2886,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1042007960}
+  - component: {fileID: 1042007963}
+  - component: {fileID: 1042007962}
+  - component: {fileID: 1042007961}
   m_Layer: 0
   m_Name: CopterBody
   m_TagString: Untagged
@@ -2966,6 +2917,72 @@ Transform:
   - {fileID: 1794881678}
   m_Father: {fileID: 937233848}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1042007961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1042007959}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c119bfd3ba5424e4fac8762d1da9ae4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  crashLayers:
+    serializedVersion: 2
+    m_Bits: 512
+  uiManager: {fileID: 1507192017}
+--- !u!54 &1042007962
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1042007959}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!136 &1042007963
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1042007959}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.6753538
+  m_Height: 3.7899098
+  m_Direction: 2
+  m_Center: {x: 0.02269423, y: 0.033118546, z: -0.5028415}
 --- !u!1 &1078356356
 GameObject:
   m_ObjectHideFlags: 0
@@ -4455,8 +4472,8 @@ Light:
   m_Type: 0
   m_Shape: 0
   m_Color: {r: 1, g: 0.91205555, b: 0.7311321, a: 1}
-  m_Intensity: 15.83
-  m_Range: 30.1
+  m_Intensity: 19.1
+  m_Range: 24.2
   m_SpotAngle: 63.52059
   m_InnerSpotAngle: 31.858261
   m_CookieSize: 10

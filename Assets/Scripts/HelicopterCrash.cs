@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class HelicopterCrash : MonoBehaviour
 {
-    public string crashTag = "Buildings";
+    [Header("Crash Layers")]
+    public LayerMask crashLayers;
 
     public UiManager uiManager;
 
@@ -14,7 +15,7 @@ public class HelicopterCrash : MonoBehaviour
     {
         if (hasCrashed) return;
 
-        if (collision.gameObject.CompareTag(crashTag))
+        if (IsInCrashLayer(collision.gameObject.layer))
         {
             hasCrashed = true;
             WhenCrashed();
@@ -25,11 +26,16 @@ public class HelicopterCrash : MonoBehaviour
     {
         if (hasCrashed) return;
 
-        if (other.CompareTag(crashTag))
+        if (IsInCrashLayer(other.gameObject.layer))
         {
             hasCrashed=true;
             WhenCrashed();
         }
+    }
+
+    bool IsInCrashLayer(int objectLayer)
+    {
+        return (crashLayers.value & (1 << objectLayer)) != 0;
     }
 
 

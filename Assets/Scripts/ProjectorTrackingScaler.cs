@@ -21,6 +21,7 @@ public class ProjectorTrackingScaler : MonoBehaviour
     {
         initialRawPos = trackerRaw.position;  //Helicopter object spawn
 
+        /*
         if (spawnPoint != null)
         {
             trackerScaled.position = spawnPoint.position;
@@ -29,6 +30,7 @@ public class ProjectorTrackingScaler : MonoBehaviour
         {
             //trackerScaled.position = new Vector3(0f, 5f, 0f);
         }
+        */
     }
 
     // Update is called once per frame
