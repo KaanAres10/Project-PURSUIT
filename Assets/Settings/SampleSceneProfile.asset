@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa7d7dc08668f0f43a7c96c1a79616f9, type: 3}
   m_Name: BenDayBloomEffectComponent
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   threshold:
     m_OverrideState: 1
     m_Value: 0.9
