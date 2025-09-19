@@ -14,6 +14,8 @@ Shader "Unlit/VolumetricFog"
         
         [HDR] _LightContribution("Light contribution", Color) = (1, 1, 1, 1)
         _LightScattering("Light scattering", Range(0, 1)) = 0.2
+        
+        _EdgePad("Edge padding", Range(0, 0.1)) = 0.03
     }
     SubShader
     {
@@ -27,7 +29,8 @@ Shader "Unlit/VolumetricFog"
             #pragma multi_compile_instancing
             #pragma multi_compile _ _USE_DRAW_PROCEDURAL
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _SHADOWS_SOFT
-            
+            #pragma multi_compile _ UNITY_SINGLE_PASS_STEREO
+
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
@@ -41,7 +44,6 @@ Shader "Unlit/VolumetricFog"
             float _StepSize;
             float _NoiseOffset;
             float4 _BlitTexture_TexelSize;
-            SamplerState sampler_TrilinearRepeat;
             TEXTURE3D(_FogNoise);
             SAMPLER(sampler_FogNoise);
             float _DensityThreshold;
@@ -51,7 +53,15 @@ Shader "Unlit/VolumetricFog"
 
             TEXTURE2D_X(_CameraOpaqueTexture);
             SAMPLER(sampler_CameraOpaqueTexture);
-        
+
+            float _EdgePad;
+
+            float  pad01(float v, float eps)   { v = saturate(v);   return v * (1.0 - 2.0*eps) + eps; }
+            float2 pad01(float2 v, float eps)  { v = saturate(v);   return v * (1.0 - 2.0*eps) + eps; }
+            float3 pad01(float3 v, float eps)  { v = saturate(v);   return v * (1.0 - 2.0*eps) + eps; }
+
+            float3 pad01Frac(float3 v, float eps) { v = frac(v); return v * (1.0 - 2.0*eps) + eps; }
+            
             float henyey_greenstein(float angle, float scattering)
             {
                 return (1.0 - angle * angle) / (4.0 * PI * pow(1.0 + scattering * scattering - (2.0 * scattering) * angle, 1.5f));
@@ -60,7 +70,10 @@ Shader "Unlit/VolumetricFog"
 
             float getDensity(float3 worldPos)
             {
-                float4 noise = SAMPLE_TEXTURE3D_LOD(_FogNoise, sampler_FogNoise, worldPos * 0.01 * _NoiseTiling, 0);
+                float3 p = worldPos * (0.01 * _NoiseTiling);
+                p = pad01Frac(p, _EdgePad);
+                
+                float4 noise = SAMPLE_TEXTURE3D_LOD(_FogNoise, sampler_FogNoise, p, 0);
                 float density = dot(noise, noise);
                 density = saturate(density - _DensityThreshold) * _DensityMultiplier;
                 return density;
@@ -70,17 +83,23 @@ Shader "Unlit/VolumetricFog"
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(IN);
 
-                float4 sceneColor = SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, IN.texcoord);
-                float depth = SampleSceneDepth(IN.texcoord);
+                float2 uv = IN.texcoord;
+                #if defined(UNITY_SINGLE_PASS_STEREO)
+                    uv = UnityStereoTransformScreenSpaceTex(uv);
+                #endif
+                uv = pad01(uv, _EdgePad);
+
+                float4 sceneColor = SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, uv);
+                float depth = SampleSceneDepth(uv);
                 
-                float3 worldPos = ComputeWorldSpacePosition(IN.texcoord, depth, UNITY_MATRIX_I_VP);
+                float3 worldPos = ComputeWorldSpacePosition(uv, depth, UNITY_MATRIX_I_VP);
 
                 float3 entryPoint = _WorldSpaceCameraPos;
                 float3 viewDir = worldPos - _WorldSpaceCameraPos;
                 float viewLength = length(viewDir);
                 float3 rayDir = normalize(viewDir);
 
-                float2 pixelCoords = IN.texcoord * _BlitTexture_TexelSize.zw;
+                float2 pixelCoords = uv * _BlitTexture_TexelSize.zw;
                 float distLimit = min(viewLength, _MaxDistance);
                 float distTravelled = InterleavedGradientNoise(pixelCoords, (int)(_Time.y / max(HALF_EPS, unity_DeltaTime.x))) * _NoiseOffset;
                 float transmittance = 1;
