@@ -7,13 +7,13 @@ public class SteeringMechanics : MonoBehaviour
     public InputActionAsset inputActions;
 
     [Header("Movement Settings")]
-    public float acceleration = 1000f;
-    public float maxSpeed = 40f;
+    public float acceleration = 1000000f;
+    public float maxSpeed = 100f;
     public float rotationSpeed = 100f;
-    public float centreOfGravityOffset = -1f;
-    public float motorTorque = 2000;
-    public float brakeTorque = 2000;
-    public float steeringRange = 30;
+    public float centreOfGravityOffset = -2f;
+    public float motorTorque = 200000;
+    public float brakeTorque = 100000;
+    public float steeringRange = 50;
     public float steeringRangeAtMaxSpeed = 10;
 
     [Header("Wheel References")]
@@ -49,40 +49,33 @@ public class SteeringMechanics : MonoBehaviour
         float throttle = throttleAction.ReadValue<float>();
         float steerLeft = steerLeftAction.ReadValue<float>();
         float steerRight = steerRightAction.ReadValue<float>();
-
-        // Combine steering inputs
-        float steerAngle = (-steerLeft + steerRight) * rotationSpeed;
+        float brake = brakeAction.ReadValue<float>();
+        float tmp = throttle - brake;
 
         float forwardSpeed = Vector3.Dot(transform.forward, rb.velocity);
         float speedFactor = Mathf.InverseLerp(0, maxSpeed, forwardSpeed);
         float currentMotorTorque = Mathf.Lerp(motorTorque, 0, speedFactor);
         float currentSteerRange = Mathf.Lerp(steeringRange, steeringRangeAtMaxSpeed, speedFactor);
+
+        // Combine steering inputs
+        float steerInput = -2*steerLeft + steerRight; // needs to be calibrated to the steering wheel
+        Debug.Log("left: " + steerLeft);
+        Debug.Log("right: " + steerRight);
+        float steerAngle = steerInput * currentSteerRange;
+
         // Apply steering to front wheels
         bool isAccelerating = Mathf.Sign(throttle) == Mathf.Sign(forwardSpeed);
 
         foreach (var wheel in wheels)
         {
-            // Apply steering to Wheel colliders that have "Steerable" enabled
             if (wheel.steerable)
             {
-                wheel.WheelCollider.steerAngle = steerAngle * currentSteerRange;
+                wheel.WheelCollider.steerAngle = steerAngle;
             }
 
-            if (isAccelerating)
+            if (wheel.motorized)
             {
-                // Apply torque to Wheel colliders that have "Motorized" enabled
-                if (wheel.motorized)
-                {
-                    wheel.WheelCollider.motorTorque = throttle * currentMotorTorque;
-                }
-                wheel.WheelCollider.brakeTorque = 0;
-            }
-            else
-            {
-                // If the user is trying to go in the opposite direction
-                // apply brakes to all wheels
-                wheel.WheelCollider.brakeTorque = Mathf.Abs(throttle) * brakeTorque;
-                wheel.WheelCollider.motorTorque = 0;
+                wheel.WheelCollider.motorTorque = tmp * currentMotorTorque;
             }
         }
     }
