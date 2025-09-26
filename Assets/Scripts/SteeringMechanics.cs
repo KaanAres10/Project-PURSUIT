@@ -26,6 +26,11 @@ public class SteeringMechanics : MonoBehaviour
 
     private Rigidbody rb;
 
+    [Header("Steering wheel asset")]
+    public Transform steeringWheelTransform;
+    public float steeringWheelMaxRotation = 450f;
+    private Quaternion initialSteeringWheelRotation;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -42,6 +47,11 @@ public class SteeringMechanics : MonoBehaviour
         brakeAction = drivingMap.FindAction("Drift");
 
         drivingMap.Enable();
+
+        if (steeringWheelTransform != null)
+        {
+            initialSteeringWheelRotation = steeringWheelTransform.localRotation;
+        }
     }
 
     void FixedUpdate()
@@ -58,13 +68,21 @@ public class SteeringMechanics : MonoBehaviour
         float currentSteerRange = Mathf.Lerp(steeringRange, steeringRangeAtMaxSpeed, speedFactor);
 
         // Combine steering inputs
-        float steerInput = -2*steerLeft + steerRight; // needs to be calibrated to the steering wheel
-        Debug.Log("left: " + steerLeft);
-        Debug.Log("right: " + steerRight);
+        float steerInput = -3*steerLeft + steerRight; // needs to be calibrated to the steering wheel
         float steerAngle = steerInput * currentSteerRange;
 
         // Apply steering to front wheels
         bool isAccelerating = Mathf.Sign(throttle) == Mathf.Sign(forwardSpeed);
+
+        if (steeringWheelTransform != null)
+        {
+            float wheelRotation = steerInput * steeringWheelMaxRotation;
+
+            Quaternion steeringRotation = Quaternion.Euler(0, wheelRotation, 0);
+
+            steeringWheelTransform.localRotation = initialSteeringWheelRotation * steeringRotation;
+        }
+
 
         foreach (var wheel in wheels)
         {
