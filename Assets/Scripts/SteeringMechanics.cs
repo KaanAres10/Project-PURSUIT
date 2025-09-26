@@ -7,86 +7,83 @@ public class SteeringMechanics : MonoBehaviour
     public InputActionAsset inputActions;
 
     [Header("Movement Settings")]
-    public float speed = 6.0f;
-    public float gravity = 20.0f;
+    public float acceleration = 1000f;
+    public float maxSpeed = 40f;
     public float rotationSpeed = 100f;
+    public float centreOfGravityOffset = -1f;
+    public float motorTorque = 2000;
+    public float brakeTorque = 2000;
+    public float steeringRange = 30;
+    public float steeringRangeAtMaxSpeed = 10;
 
-    [Header("Drift Settings")]
-    public float driftIntensity = 2.0f;
-    public float driftSteerMultiplier = 2.0f;
-    public KeyCode driftKey = KeyCode.Space;
+    [Header("Wheel References")]
+    WheelControl[] wheels;
 
-    [Header("Debug")]
-    public float driftAngle;
-
-    private Vector3 moveDirection = Vector3.zero;
-    private CharacterController controller;
-
-    private InputAction steerAction;
+    private InputAction steerLeftAction;
+    private InputAction steerRightAction;
     private InputAction throttleAction;
-    private InputAction driftAction;
+    private InputAction brakeAction;
 
-    private Vector3 previousForward;
+    private Rigidbody rb;
 
     void Start()
     {
-        controller = GetComponent<CharacterController>();
+        rb = GetComponent<Rigidbody>();
+        Vector3 centerOfMass = rb.centerOfMass;
+        centerOfMass.y += centreOfGravityOffset;
+        rb.centerOfMass = centerOfMass;
+
+        wheels = GetComponentsInChildren<WheelControl>();
 
         var drivingMap = inputActions.FindActionMap("Driving");
-        steerAction = drivingMap.FindAction("Steer");
+        steerLeftAction = drivingMap.FindAction("SteerLeft");
+        steerRightAction = drivingMap.FindAction("SteerRight");
         throttleAction = drivingMap.FindAction("Throttle");
-        driftAction = drivingMap.FindAction("Drift");
+        brakeAction = drivingMap.FindAction("Drift");
 
         drivingMap.Enable();
-
-        previousForward = transform.forward;
     }
 
-    void Update()
+    void FixedUpdate()
     {
         float throttle = throttleAction.ReadValue<float>();
-        float steer = steerAction.ReadValue<float>();
+        float steerLeft = steerLeftAction.ReadValue<float>();
+        float steerRight = steerRightAction.ReadValue<float>();
 
-        // Remap 0-1 to -1 to +1
-        steer = (steer - 0.5f) * 2f + 0.5f;
+        // Combine steering inputs
+        float steerAngle = (-steerLeft + steerRight) * rotationSpeed;
 
-        // Deadzone
-        if (Mathf.Abs(steer) < 0.1f)
-            steer = 0;
+        float forwardSpeed = Vector3.Dot(transform.forward, rb.velocity);
+        float speedFactor = Mathf.InverseLerp(0, maxSpeed, forwardSpeed);
+        float currentMotorTorque = Mathf.Lerp(motorTorque, 0, speedFactor);
+        float currentSteerRange = Mathf.Lerp(steeringRange, steeringRangeAtMaxSpeed, speedFactor);
+        // Apply steering to front wheels
+        bool isAccelerating = Mathf.Sign(throttle) == Mathf.Sign(forwardSpeed);
 
-        // Calculate forward and lateral movement
-        Vector3 forward = transform.forward * throttle * speed;
-        Vector3 lateral = - transform.right * steer * driftIntensity;
-
-        bool isDrifting = driftAction.ReadValue<float>() > 0f;
-
-        // Combine movement
-        moveDirection = isDrifting ? forward + lateral : forward;
-        moveDirection.y -= gravity * Time.deltaTime;
-
-        controller.Move(moveDirection * Time.deltaTime);
-
-        // Rotate car
-        float rotationFactor = isDrifting ? driftSteerMultiplier : 1f;
-        transform.Rotate(0, steer * rotationSpeed * rotationFactor * Time.deltaTime, 0);
-
-        // Drift angle debug
-        CalculateDriftAngle();
-    }
-
-    void CalculateDriftAngle()
-    {
-        // Angle between where car is facing and where it's actually moving
-        Vector3 flatVelocity = new Vector3(controller.velocity.x, 0, controller.velocity.z);
-        Vector3 flatForward = new Vector3(transform.forward.x, 0, transform.forward.z);
-
-        if (flatVelocity.magnitude > 0.1f)
+        foreach (var wheel in wheels)
         {
-            driftAngle = Vector3.SignedAngle(flatForward, flatVelocity, Vector3.up);
-        }
-        else
-        {
-            driftAngle = 0;
+            // Apply steering to Wheel colliders that have "Steerable" enabled
+            if (wheel.steerable)
+            {
+                wheel.WheelCollider.steerAngle = steerAngle * currentSteerRange;
+            }
+
+            if (isAccelerating)
+            {
+                // Apply torque to Wheel colliders that have "Motorized" enabled
+                if (wheel.motorized)
+                {
+                    wheel.WheelCollider.motorTorque = throttle * currentMotorTorque;
+                }
+                wheel.WheelCollider.brakeTorque = 0;
+            }
+            else
+            {
+                // If the user is trying to go in the opposite direction
+                // apply brakes to all wheels
+                wheel.WheelCollider.brakeTorque = Mathf.Abs(throttle) * brakeTorque;
+                wheel.WheelCollider.motorTorque = 0;
+            }
         }
     }
 }

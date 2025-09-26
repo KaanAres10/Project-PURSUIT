@@ -38,7 +38,8 @@ public class ProjectorTrackingScaler : MonoBehaviour
     {
         Debug.Log("initial pos" + initialRawPos);
 
-        Vector3 offset = trackerRaw.position - initialRawPos;
+        //Vector3 offset = trackerRaw.position - initialRawPos;
+        Vector3 offset = trackerRaw.position - Vector3.zero;
 
         Debug.Log("offset" + offset);
 
@@ -51,7 +52,8 @@ public class ProjectorTrackingScaler : MonoBehaviour
             offset *= scaleFactor;
         }
 
-        trackerScaled.position = initialRawPos + offset;
+        //trackerScaled.position = initialRawPos + offset;
+        trackerScaled.position = spawnPoint.position + offset;
         trackerScaled.rotation = trackerRaw.rotation;
 
         Debug.Log("raw tracker" + trackerRaw.position);
