@@ -16,6 +16,9 @@ Shader "Unlit/VolumetricFog"
         _LightScattering("Light scattering", Range(0, 1)) = 0.2
         
         _EdgePad("Edge padding", Range(0, 0.1)) = 0.03
+        
+        _LightClearsFog("Light clears fog", Range(0,1)) = 0
+
     }
     SubShader
     {
@@ -30,6 +33,9 @@ Shader "Unlit/VolumetricFog"
             #pragma multi_compile _ _USE_DRAW_PROCEDURAL
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _SHADOWS_SOFT
             #pragma multi_compile _ UNITY_SINGLE_PASS_STEREO
+
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS           
+            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS     
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
@@ -61,6 +67,9 @@ Shader "Unlit/VolumetricFog"
             float3 pad01(float3 v, float eps)  { v = saturate(v);   return v * (1.0 - 2.0*eps) + eps; }
 
             float3 pad01Frac(float3 v, float eps) { v = frac(v); return v * (1.0 - 2.0*eps) + eps; }
+
+            float _LightClearsFog;
+
             
             float henyey_greenstein(float angle, float scattering)
             {
@@ -114,8 +123,34 @@ Shader "Unlit/VolumetricFog"
                     {
                         Light mainLight = GetMainLight(TransformWorldToShadowCoord(rayPos));
                         fogCol.rgb += mainLight.color.rgb * _LightContribution.rgb * henyey_greenstein(dot(rayDir, mainLight.direction), _LightScattering) *  density * mainLight.shadowAttenuation * _StepSize;
-                        transmittance *= exp(-density * _StepSize);
-                    }
+
+
+                        #ifdef _ADDITIONAL_LIGHTS
+                        int addCount = GetAdditionalLightsCount();
+                        float maxLightPresence = 0.0;
+                        [loop]
+                        for (int li = 0; li < addCount; li++)
+                        {
+                            Light L = GetAdditionalLight(li, rayPos);
+                            float cosTheat = dot(-rayDir, L.direction);
+                            float phase = henyey_greenstein(cosTheat, _LightScattering);
+                            float atten = L.distanceAttenuation;
+
+                            fogCol.rgb += L.color.rgb * _LightContribution.rgb * phase * density * atten * _StepSize;
+
+                            maxLightPresence = max(maxLightPresence, saturate(atten));
+                        }
+                        #endif
+                        
+                        
+                        float lightPresence = maxLightPresence; // 0..1
+                        float litDensity = lerp(density, density * (1.0 - _LightClearsFog * lightPresence), _LightClearsFog);
+
+                        // Single extinction update for the step
+                        transmittance *= exp(-litDensity * _StepSize);
+
+                        // (Minor perf win)
+                        if (transmittance < 1e-3) break; }
                     distTravelled += _StepSize;
                 }
 
