@@ -29,11 +29,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _RimSharpness: 16
-    - _Smoothness: 16
+    - _RimSharpness: 418
+    - _Smoothness: 388.8
     m_Colors:
     - RimColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.69182384, g: 0.69182384, b: 0.69182384, a: 1}
     - _RimColor: {r: 0.8611373, g: 1, b: 0, a: 1}
-    - _WorldColor: {r: 0, g: 0, b: 0, a: 1}
+    - _WorldColor: {r: 0.5943395, g: 0.7054793, b: 1, a: 1}
   m_BuildTextureStacks: []
