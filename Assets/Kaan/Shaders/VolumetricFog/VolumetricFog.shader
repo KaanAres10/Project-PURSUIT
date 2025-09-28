@@ -150,7 +150,8 @@ Shader "Unlit/VolumetricFog"
                         transmittance *= exp(-litDensity * _StepSize);
 
                         // (Minor perf win)
-                        if (transmittance < 1e-3) break; }
+                        if (transmittance < 1e-3) break;
+                    }
                     distTravelled += _StepSize;
                 }
 
