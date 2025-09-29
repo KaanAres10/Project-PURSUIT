@@ -14,8 +14,8 @@ Material:
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 1
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
@@ -24,23 +24,25 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _FogNoise:
-        m_Texture: {fileID: 11700000, guid: 1a548311b46def94c822a7cecc428e2a, type: 2}
+        m_Texture: {fileID: 11700000, guid: 1174c120428e59a4598294aa1634a598, type: 2}
         m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 1, y: 1}
+        m_Offset: {x: -225.15, y: 1}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _DensityMultiplier: 0.002
+    - _DensityMultiplier: 0.06
     - _DensityThreshold: 1
-    - _LightScattering: 0.15
-    - _MaxDistance: 100
+    - _EdgePad: 0.03
+    - _LightClearsFog: 0.659
+    - _LightScattering: 0.469
+    - _MaxDistance: 50
     - _NoiseOffset: 1
-    - _NoiseTiling: 6
-    - _StepSize: 10.95
+    - _NoiseTiling: 6.4
+    - _StepSize: 1
     m_Colors:
-    - _Color: {r: 0.51572317, g: 0.51572317, b: 0.51572317, a: 1}
+    - _Color: {r: 0.25198755, g: 0.36057168, b: 0.8616352, a: 1}
     - _LightContribution: {r: 1, g: 0.5703092, b: 0.028301716, a: 1}
   m_BuildTextureStacks: []
