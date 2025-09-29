@@ -16,6 +16,7 @@ public class SpotlightDetector : MonoBehaviour
     public LayerMask obstructionMask;
 
     public UiManager uiManager;
+    public FuzzyEffectController fuzzyController;
 
     private float detectionTimer = 0f;
 
@@ -24,12 +25,14 @@ public class SpotlightDetector : MonoBehaviour
     {
         if (CarInSpotlight())
         {
+            if (fuzzyController.CanDetectCar()) { 
             detectionTimer += Time.deltaTime;
 
-            if(detectionTimer >= requiredTime)
+            if (detectionTimer >= requiredTime)
             {
                 ProjectorPlayerWins();
             }
+        }
         }
         else
         {
