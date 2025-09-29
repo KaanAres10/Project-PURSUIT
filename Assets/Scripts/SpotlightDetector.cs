@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,18 +21,29 @@ public class SpotlightDetector : MonoBehaviour
     private float detectionTimer = 0f;
 
     // Update is called once per frame
+
+    void Start()
+    {
+        GameObject carObj = GameObject.FindGameObjectWithTag("Car");
+        if (carObj != null)
+            car = carObj.transform;
+        else
+            Debug.LogError("Car not found! Make sure it has tag 'Car'.");
+    }
+
     void Update()
     {
         if (CarInSpotlight())
         {
-            if (fuzzyController.CanDetectCar()) { 
+            Debug.Log("Can see youoooooo");
+            //if (fuzzyController.CanDetectCar()) { 
             detectionTimer += Time.deltaTime;
 
             if (detectionTimer >= requiredTime)
             {
                 ProjectorPlayerWins();
             }
-        }
+      //  }
         }
         else
         {
@@ -53,12 +64,16 @@ public class SpotlightDetector : MonoBehaviour
         float distance = toCar.magnitude;
         Vector3 dirToCar = toCar.normalized;
 
+
         //Angle check
         float angle = Vector3.Angle(spotlight.transform.forward, dirToCar);
         if (angle > spotlight.spotAngle / 2f) return false;
 
         //Distance check
         if(distance > spotlight.range) return false;
+
+        Debug.Log("Angle:" + angle + "Distance: " + distance);
+        Debug.Log("necessary spot angle: " + spotlight.spotAngle / 2f);
 
         //raycast for blockage
         if (Physics.Raycast(spotlight.transform.position, dirToCar, out RaycastHit hit, spotlight.range, ~0))
