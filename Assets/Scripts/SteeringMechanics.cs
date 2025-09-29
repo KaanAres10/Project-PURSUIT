@@ -1,10 +1,15 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.XR.Interaction.Toolkit;
+
 
 public class SteeringMechanics : MonoBehaviour
 {
     [Header("References")]
     public InputActionAsset inputActions;
+    public TunnelingVignetteController vignette;
+    public VrDrivingComfort provider;
 
     [Header("Movement Settings")]
     public float acceleration = 1000000f;
@@ -68,7 +73,7 @@ public class SteeringMechanics : MonoBehaviour
         float currentSteerRange = Mathf.Lerp(steeringRange, steeringRangeAtMaxSpeed, speedFactor);
 
         // Combine steering inputs
-        float steerInput = -3*steerLeft + steerRight; // needs to be calibrated to the steering wheel
+        float steerInput = -2*steerLeft + steerRight; // needs to be calibrated to the steering wheel
         float steerAngle = steerInput * currentSteerRange;
 
         // Apply steering to front wheels
@@ -96,5 +101,22 @@ public class SteeringMechanics : MonoBehaviour
                 wheel.WheelCollider.motorTorque = tmp * currentMotorTorque;
             }
         }
+
+        float rbspeed = rb.velocity.magnitude;
+        float angSpeed = rb.angularVelocity.magnitude * Mathf.Rad2Deg;
+
+        
+        if (rbspeed > 10.0f || angSpeed > 20.0f)
+        {
+            vignette.BeginTunnelingVignette(provider);
+            Debug.Log("Vignette Activated");
+        }
+        else
+        {
+            Debug.Log("vignette off");
+            vignette.EndTunnelingVignette(provider);
+        }
+      
+
     }
 }
