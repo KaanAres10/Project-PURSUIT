@@ -7,7 +7,7 @@
             "id": "90c4db25-a671-4dc6-827a-5c85d2ac9303",
             "actions": [
                 {
-                    "name": "Steer",
+                    "name": "SteerLeft",
                     "type": "Button",
                     "id": "87e0d6c8-3da4-4e9c-b8e5-d81604276424",
                     "expectedControlType": "",
@@ -32,28 +32,26 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "SteerRight",
+                    "type": "Button",
+                    "id": "27f760e7-a7c1-4056-8c96-0f6d6adf501b",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
                 {
                     "name": "",
                     "id": "af8e389d-d91c-4e04-8f7c-1e02615c3c51",
-                    "path": "<Joystick>/stick/left",
+                    "path": "<HID::Thrustmaster FGT Rumble 3-in-1>/stick/left",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Steer",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "97097e0b-aa84-431d-b56f-f22581d20322",
-                    "path": "<Joystick>/stick/right",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Steer",
+                    "action": "SteerLeft",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -76,6 +74,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Drift",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "38b21872-3b6c-4858-ab19-042121221252",
+                    "path": "<HID::Thrustmaster FGT Rumble 3-in-1>/stick/right",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SteerRight",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
