@@ -10,6 +10,8 @@ public class SpotlightDetector : MonoBehaviour
     public Light spotlight;
     public Transform car;
     public Image uiFillBar;
+    private Renderer hornRenderer;
+    private Renderer leatherRenderer;
 
     [Header("Detection Settings")]
     public float requiredTime = 5f;
@@ -20,13 +22,39 @@ public class SpotlightDetector : MonoBehaviour
 
     private float detectionTimer = 0f;
 
+    [Header("Steering Wheel warnings")]
+    public Color detectedColor = Color.red;
+    public Color hiddenColor = Color.green;
+
     // Update is called once per frame
 
     void Start()
     {
         GameObject carObj = GameObject.FindGameObjectWithTag("Car");
-        if (carObj != null)
+        if (carObj != null){ 
             car = carObj.transform;
+
+            // Search for steering_green among children
+            Transform steering = car.Find("steering_green");
+            if (steering == null)
+            {
+                Debug.LogError("steering_green not found under Car");
+             
+            }
+            // Search for horn and leather under steering
+            hornRenderer = steering.Find("horn")?.GetComponent<Renderer>();
+            leatherRenderer = steering.Find("Leather")?.GetComponent<Renderer>();
+            Debug.Log(hornRenderer);
+
+            if (hornRenderer == null)
+            {
+                Debug.Log("horn not found under Car");
+            }
+            if (leatherRenderer == null)
+            {
+                Debug.Log("Leather not found under Car");
+            }
+        }
         else
             Debug.LogError("Car not found! Make sure it has tag 'Car'.");
     }
@@ -36,18 +64,39 @@ public class SpotlightDetector : MonoBehaviour
         if (CarInSpotlight())
         {
             Debug.Log("Can see youoooooo");
-            //if (fuzzyController.CanDetectCar()) { 
+           
             detectionTimer += Time.deltaTime;
+
+            if (hornRenderer != null) {
+                hornRenderer.material.SetColor("_BaseColor", detectedColor);
+                hornRenderer.material.SetColor("_EmissionColor", detectedColor);
+            }
+            if (leatherRenderer != null)
+            {
+                leatherRenderer.material.SetColor("_BaseColor", detectedColor);
+                leatherRenderer.material.SetColor("_EmissionColor", detectedColor);
+            }
 
             if (detectionTimer >= requiredTime)
             {
                 ProjectorPlayerWins();
             }
-      //  }
         }
         else
         {
             detectionTimer = 0f;
+
+            if (hornRenderer != null)
+            {
+                hornRenderer.material.SetColor("_BaseColor", hiddenColor);
+                hornRenderer.material.SetColor("_EmissionColor", hiddenColor);
+            }
+            if (leatherRenderer != null)
+            {
+                leatherRenderer.material.SetColor("_BaseColor", hiddenColor);
+                leatherRenderer.material.SetColor("_EmissionColor", hiddenColor);
+            }
+
         }
 
         if (uiFillBar != null) 
