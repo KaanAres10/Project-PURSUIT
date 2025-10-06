@@ -132,7 +132,7 @@ Shader "Unlit/VolumetricFog"
                         for (int li = 0; li < addCount; li++)
                         {
                             Light L = GetAdditionalLight(li, rayPos);
-                            float cosTheat = dot(-rayDir, L.direction);
+                            float cosTheat = dot(-rayDir, -L.direction);
                             float phase = henyey_greenstein(cosTheat, _LightScattering);
                             float atten = L.distanceAttenuation;
 
