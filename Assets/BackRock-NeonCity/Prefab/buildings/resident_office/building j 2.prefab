@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 33043298889741940}
   - component: {fileID: 23763894121476634}
   - component: {fileID: 4774529208306723053}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: building j 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29,7 +29,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 17.985905, y: 17.985905, z: 17.985905}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -103,5 +103,5 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.59047794, y: 0.4778074, z: 1.9182465}
-  m_Center: {x: 0, y: 0, z: 0.0023338497}
+  m_Size: {x: 0.52240574, y: 0.4778074, z: 1.8286687}
+  m_Center: {x: -0.034036182, y: 0, z: 0.0010971607}
