@@ -40,7 +40,8 @@ Material:
     m_Floats:
     - _BakedBlend: 1
     - _BakedDensityScale: 1.22
-    - _BakedLightIntensity: 2.56
+    - _BakedLightIntensity: 4
+    - _BakedRGBBoost: 1
     - _BaseFogIntensity: 1.21
     - _DebugBakedPreview: 0
     - _DensityMultiplier: 0.04
@@ -53,7 +54,7 @@ Material:
     - _MaxDistance: 100
     - _NoiseOffset: 1
     - _NoiseTiling: 6.4
-    - _PhaseG: 0.77
+    - _PhaseG: 0.36
     - _StepSize: 2
     - _UseBaked: 1
     m_Colors:

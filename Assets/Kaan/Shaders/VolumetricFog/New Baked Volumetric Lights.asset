@@ -20,8 +20,8 @@ MonoBehaviour:
   spots:
   - positionWS: {x: 97.36, y: 8.52, z: -290.74}
     range: 15
-    directionWS: {x: 0, y: 100, z: 200}
-    cosInner: -207.7
+    directionWS: {x: 35.89, y: 420.9, z: -545.9}
+    cosInner: -453.6
     color: {r: 1, g: 0.82555234, b: 0, a: 0}
-    intensity: 90
-    cosOuter: 0
+    intensity: 465
+    cosOuter: 70.1
