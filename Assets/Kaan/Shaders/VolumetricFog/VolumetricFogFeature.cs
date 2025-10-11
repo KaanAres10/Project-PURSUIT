@@ -1,27 +1,40 @@
 using UnityEngine;
+using UnityEngine.Profiling;                    // <-- for BeginSample / EndSample labels
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
 public class VolumetricFogFeature : ScriptableRendererFeature
 {
-    [Header("Fog Settings")]
-    public Material fogMaterial;
-    public int passIndex = 0;
+    public enum InjectionPoint
+    {
+        BeforeRenderingTransparents = RenderPassEvent.BeforeRenderingTransparents,
+        BeforeRenderingPostProcessing = RenderPassEvent.BeforeRenderingPostProcessing,
+        AfterRenderingPostProcessing  = RenderPassEvent.AfterRenderingPostProcessing
+    }
+
+    public enum Downsample
+    {
+        x1 = 1,
+        x2 = 2,
+        x4 = 4
+    }
 
     [Header("Execution")]
-    public RenderPassEvent injectionPoint = RenderPassEvent.BeforeRenderingPostProcessing;
+    public InjectionPoint injectionPoint = InjectionPoint.BeforeRenderingPostProcessing;
 
-    [Header("Baked Volume (optional)")]
-    public BakedVolumeAsset bakedAsset;
+    [Tooltip("Material using shader \"Unlit/VolumetricFog\"")]
+    public Material fogMaterial;
 
-    [Header("Baked Analytic Lights (optional)")]
-    public BakedVolumetricLights bakedLights;
+    [Tooltip("Shader pass index (usually 0).")]
+    public int passIndex = 0;
 
-    [Header("Dynamic Spotlight (optional)")]
-    public Light spotlight; // assign a Unity Light here (e.g., a real Spot light in the scene)
-    
-    public enum Downsample { x1 = 1, x2 = 2, x4 = 4 }
+    [Header("Quality")]
+    [Tooltip("Render the fog at lower resolution, then upsample.")]
     public Downsample downsample = Downsample.x1;
+
+    [Header("Buffers")]
+    [Tooltip("Bind camera depth-stencil while drawing (not required for Blit path; kept for legacy).")]
+    public bool bindDepthStencilAttachment = false;
 
     private FullscreenFogPass _pass;
 
@@ -32,142 +45,145 @@ public class VolumetricFogFeature : ScriptableRendererFeature
 
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
-        if (fogMaterial == null) return;
+        if (UniversalRenderer.IsOffscreenDepthTexture(in renderingData.cameraData) ||
+            renderingData.cameraData.cameraType == CameraType.Preview ||
+            renderingData.cameraData.cameraType == CameraType.Reflection)
+            return;
 
-        _pass.Setup(fogMaterial, passIndex, downsample, bakedAsset, bakedLights, spotlight);
-        _pass.renderPassEvent = injectionPoint;
+        if (fogMaterial == null)
+        {
+            Debug.LogWarning($"[{nameof(VolumetricFogFeature)}] Assign a fog material (shader \"Unlit/VolumetricFog\").");
+            return;
+        }
+
+        if (passIndex < 0 || passIndex >= fogMaterial.passCount)
+        {
+            Debug.LogWarning($"[{nameof(VolumetricFogFeature)}] passIndex out of range for material \"{fogMaterial.name}\".");
+            return;
+        }
+
         _pass.ConfigureInput(ScriptableRenderPassInput.Color | ScriptableRenderPassInput.Depth);
+        _pass.renderPassEvent = (RenderPassEvent)injectionPoint;
+        _pass.Setup(fogMaterial, passIndex, downsample, bindDepthStencilAttachment);
         renderer.EnqueuePass(_pass);
     }
 
-    // =======================================================================
+    protected override void Dispose(bool disposing)
+    {
+        _pass?.Dispose();
+    }
+
+    // ---------------- PASS ----------------
     class FullscreenFogPass : ScriptableRenderPass
     {
         private Material _mat;
         private int _passIndex;
         private Downsample _downsample;
+        private bool _bindDepthStencil;
 
-        private BakedVolumeAsset _baked;
-        private BakedVolumetricLights _bakedLights;
-        private Light _spotlight;
-
-        private RTHandle _rtLow;
-        private RTHandle _rtTemp;
-
-        // baked volume properties
-        static readonly int _BakedVolumeTex    = Shader.PropertyToID("_BakedVolumeTex");
-        static readonly int _BakedVolumeCenter = Shader.PropertyToID("_BakedVolumeCenterWS");
-        static readonly int _BakedVolumeSize   = Shader.PropertyToID("_BakedVolumeSizeWS");
-        static readonly int _BakedDensityScale = Shader.PropertyToID("_BakedDensityScale");
-        static readonly int _BakedBlend        = Shader.PropertyToID("_BakedBlend");
-
-        // spotlight properties
-        static readonly int _SpotPosWS      = Shader.PropertyToID("_SpotPosWS");
-        static readonly int _SpotDirWS      = Shader.PropertyToID("_SpotDirWS");
-        static readonly int _SpotRange      = Shader.PropertyToID("_SpotRange");
-        static readonly int _SpotInnerDeg   = Shader.PropertyToID("_SpotInnerDeg");
-        static readonly int _SpotOuterDeg   = Shader.PropertyToID("_SpotOuterDeg");
-        static readonly int _SpotColor      = Shader.PropertyToID("_SpotColor");
-        static readonly int _SpotIntensity  = Shader.PropertyToID("_SpotIntensity");
+        private RTHandle _rtLow;     // downsampled target (optional)
+        private RTHandle _rtTemp;    // temp when downsample is x1 (ping-pong)
 
         public FullscreenFogPass(string profilerName)
         {
             profilingSampler = new ProfilingSampler(profilerName);
         }
 
-        public void Setup(Material mat, int passIndex, Downsample downsample,
-                          BakedVolumeAsset baked, BakedVolumetricLights bakedLights, Light spot)
+        public void Setup(Material m, int passIndex, Downsample downsample, bool bindDepth)
         {
-            _mat = mat;
+            _mat = m;
             _passIndex = passIndex;
             _downsample = downsample;
-            _baked = baked;
-            _bakedLights = bakedLights;
-            _spotlight = spot;
+            _bindDepthStencil = bindDepth;
         }
 
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
         {
+            ResetTarget();
+
+            // Make the top-level profiler sample label reflect the resolution (nice in Profiler)
+            profilingSampler = new ProfilingSampler(
+                _downsample == Downsample.x1 ? "VolumetricFog (x1)" :
+                _downsample == Downsample.x2 ? "VolumetricFog (x2)" :
+                                               "VolumetricFog (x4)");
+
             var desc = renderingData.cameraData.cameraTargetDescriptor;
-            desc.depthBufferBits = 0;
             desc.msaaSamples = 1;
+            desc.depthBufferBits = 0;
 
             if (_downsample == Downsample.x1)
             {
                 RenderingUtils.ReAllocateIfNeeded(ref _rtTemp, desc, name: "_VolumetricFog_Temp");
                 _rtLow?.Release();
+                _rtLow = null;
             }
             else
             {
                 int factor = (int)_downsample;
                 desc.width  = Mathf.Max(1, desc.width  / factor);
                 desc.height = Mathf.Max(1, desc.height / factor);
+
                 RenderingUtils.ReAllocateIfNeeded(ref _rtLow, desc, name: "_VolumetricFog_Low");
                 _rtTemp?.Release();
+                _rtTemp = null;
             }
-        }
-
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
-        {
-            var cmd = CommandBufferPool.Get("VolumetricFog");
-
-            using (new ProfilingScope(cmd, profilingSampler))
-            {
-                var camColor = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-                // ---- spotlight injection ----
-                if (_spotlight != null && _spotlight.type == LightType.Spot)
-                {
-                    var dir = _spotlight.transform.forward.normalized;
-                    var pos = _spotlight.transform.position;
-                    float inner = _spotlight.innerSpotAngle * 0.5f;
-                    float outer = _spotlight.spotAngle * 0.5f;
-
-                    cmd.SetGlobalVector(_SpotPosWS, pos);
-                    cmd.SetGlobalVector(_SpotDirWS, dir);
-                    cmd.SetGlobalFloat(_SpotRange, _spotlight.range);
-                    cmd.SetGlobalFloat(_SpotInnerDeg, inner);
-                    cmd.SetGlobalFloat(_SpotOuterDeg, outer);
-                    cmd.SetGlobalVector(_SpotColor, _spotlight.color.linear);
-                    cmd.SetGlobalFloat(_SpotIntensity, _spotlight.intensity);
-                }
-
-                // ---- baked volume ----
-                if (_baked != null && _baked.volumeTex != null)
-                {
-                    cmd.SetGlobalTexture(_BakedVolumeTex, _baked.volumeTex);
-                    cmd.SetGlobalVector (_BakedVolumeCenter, _baked.volumeCenterWS);
-                    cmd.SetGlobalVector (_BakedVolumeSize,   _baked.volumeSizeWS);
-                    cmd.SetGlobalFloat  (_BakedDensityScale, _baked.densityScale);
-                    cmd.SetGlobalFloat  (_BakedBlend,        _baked.bakedBlend);
-                    _mat.EnableKeyword("_USE_BAKED_VOLUME");
-                }
-                else
-                {
-                    _mat.DisableKeyword("_USE_BAKED_VOLUME");
-                }
-
-                // ---- draw pass ----
-                if (_downsample == Downsample.x1)
-                {
-                    Blitter.BlitCameraTexture(cmd, camColor, _rtTemp, _mat, _passIndex);
-                    Blitter.BlitCameraTexture(cmd, _rtTemp, camColor);
-                }
-                else
-                {
-                    Blitter.BlitCameraTexture(cmd, camColor, _rtLow, _mat, _passIndex);
-                    Blitter.BlitCameraTexture(cmd, _rtLow, camColor);
-                }
-            }
-
-            context.ExecuteCommandBuffer(cmd);
-            CommandBufferPool.Release(cmd);
         }
 
         public void Dispose()
         {
             _rtLow?.Release();
             _rtTemp?.Release();
+        }
+
+        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+        {
+            CommandBuffer cmd = CommandBufferPool.Get(profilingSampler.name);
+
+            using (new ProfilingScope(cmd, profilingSampler))
+            {
+                ref var camData = ref renderingData.cameraData;
+                var camColor = camData.renderer.cameraColorTargetHandle;
+
+                if (_downsample == Downsample.x1)
+                {
+                    // ---- MATERIAL RAYMARCH BLIT (x1) ----
+                    cmd.BeginSample("VolumetricFog: MaterialBlit (x1)");
+                    Blitter.BlitCameraTexture(cmd, camColor, _rtTemp, _mat, _passIndex);
+                    cmd.EndSample("VolumetricFog: MaterialBlit (x1)");
+
+                    // ---- COMPOSITE BACK (x1) ----
+                    cmd.BeginSample("VolumetricFog: CompositeBack (x1)");
+                    Blitter.BlitCameraTexture(cmd, _rtTemp, camColor);
+                    cmd.EndSample("VolumetricFog: CompositeBack (x1)");
+                }
+                else if (_downsample == Downsample.x2)
+                {
+                    // ---- MATERIAL RAYMARCH BLIT (x2) ----
+                    cmd.BeginSample("VolumetricFog: MaterialBlit (x2)");
+                    Blitter.BlitCameraTexture(cmd, camColor, _rtLow, _mat, _passIndex);
+                    cmd.EndSample("VolumetricFog: MaterialBlit (x2)");
+
+                    // ---- UPSAMPLE + COMPOSITE (x2) ----
+                    cmd.BeginSample("VolumetricFog: UpsampleComposite (x2)");
+                    Blitter.BlitCameraTexture(cmd, _rtLow, camColor);
+                    cmd.EndSample("VolumetricFog: UpsampleComposite (x2)");
+                }
+                else // x4
+                {
+                    // ---- MATERIAL RAYMARCH BLIT (x4) ----
+                    cmd.BeginSample("VolumetricFog: MaterialBlit (x4)");
+                    Blitter.BlitCameraTexture(cmd, camColor, _rtLow, _mat, _passIndex);
+                    cmd.EndSample("VolumetricFog: MaterialBlit (x4)");
+
+                    // ---- UPSAMPLE + COMPOSITE (x4) ----
+                    cmd.BeginSample("VolumetricFog: UpsampleComposite (x4)");
+                    Blitter.BlitCameraTexture(cmd, _rtLow, camColor);
+                    cmd.EndSample("VolumetricFog: UpsampleComposite (x4)");
+                }
+            }
+
+            context.ExecuteCommandBuffer(cmd);
+            CommandBufferPool.Release(cmd);
         }
     }
 }
