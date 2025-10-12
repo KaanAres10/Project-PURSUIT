@@ -23,6 +23,9 @@ Shader "Unlit/VolumetricFog"
         _BLV_Origin("Volume Origin (world)", Vector) = (0,0,0,0)
         _BLV_Size("Volume Size (world)", Vector) = (10,10,10,0)
         _UseBakedVolume("Use Baked Volume", Float) = 1
+        
+        _MaxSteps("Max March Steps", Range(1,1024)) = 256
+
 
     }
     SubShader
@@ -79,6 +82,7 @@ Shader "Unlit/VolumetricFog"
             float3 _BLV_Size;     // world-space size (x,y,z)
             float  _UseBakedVolume;
 
+            float _MaxSteps;
 
 
             float3 SampleBakedLight(float3 worldPos)
@@ -106,68 +110,75 @@ Shader "Unlit/VolumetricFog"
                 return density;
             }
             
-            half4 frag(Varyings IN): SV_TARGET
-            {
-                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(IN);
+half4 frag(Varyings IN): SV_TARGET
+{
+    UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(IN);
 
-                float2 uv = IN.texcoord;
-                #if defined(UNITY_SINGLE_PASS_STEREO)
-                    uv = UnityStereoTransformScreenSpaceTex(uv);
-                #endif
-                uv = pad01(uv, _EdgePad);
+    float2 uv = IN.texcoord;
+    #if defined(UNITY_SINGLE_PASS_STEREO)
+    uv = UnityStereoTransformScreenSpaceTex(uv);
+    #endif
+    uv = pad01(uv, _EdgePad);
 
-                float4 sceneColor = SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, uv);
-                float depth = SampleSceneDepth(uv);
-                
-                float3 worldPos = ComputeWorldSpacePosition(uv, depth, UNITY_MATRIX_I_VP);
+    float4 sceneColor = SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, uv);
+    float depth = SampleSceneDepth(uv);
+    float3 worldPos = ComputeWorldSpacePosition(uv, depth, UNITY_MATRIX_I_VP);
 
-                float3 entryPoint = _WorldSpaceCameraPos;
-                float3 viewDir = worldPos - _WorldSpaceCameraPos;
-                float viewLength = length(viewDir);
-                float3 rayDir = normalize(viewDir);
+    float3 entryPoint = _WorldSpaceCameraPos;
+    float3 viewDir = worldPos - _WorldSpaceCameraPos;
+    float viewLength = length(viewDir);
+    float3 rayDir = normalize(viewDir);
 
-                float2 pixelCoords = uv * _BlitTexture_TexelSize.zw;
-                float distLimit = min(viewLength, _MaxDistance);
-                float distTravelled = InterleavedGradientNoise(pixelCoords, (int)(_Time.y / max(HALF_EPS, unity_DeltaTime.x))) * _NoiseOffset;
-                float transmittance = 1;
-                float4 fogCol = _Color;
-                
+    float2 pixelCoords = uv * _BlitTexture_TexelSize.zw;
 
-                float3 probePos = entryPoint + rayDir * (distLimit * 0.5);
-                
-                // Debug Light Volume
-                //return float4(SampleBakedLight(probePos), 1);
-                
-                float3 Li_const = SampleBakedLight(probePos);                // 0..∞, depends on your baked volume values
-                float  presence_const = saturate(dot(Li_const, float3(0.2126, 0.7152, 0.0722))); // luminance 0..1 for "light clears fog"
-                
-                while (distTravelled < distLimit)
-                {
-                    float3 rayPos = entryPoint + rayDir * distTravelled;
-    float  density = getDensity(rayPos);
+    float distLimit = min(viewLength, _MaxDistance);
+
+    float stepLen = max(_StepSize, 1e-4);
+int   maxSteps = (int)min(_MaxSteps, ceil(distLimit / stepLen) + 1);
+    
+    float transmittance = 1.0;
+    float4 fogCol = _Color;
+
+    // --- DEBUG: visualize baked volume at midpoint ---
+    // float3 dbgUVW = (entryPoint + rayDir * (distLimit * 0.5) - _BLV_Origin) / max(_BLV_Size, 1e-5);
+    // return float4(SAMPLE_TEXTURE3D(_BakedLightVolume, sampler_BakedLightVolume, saturate(dbgUVW)).rgb, 1);
+
+    const float3 LUMA = float3(0.2126, 0.7152, 0.0722);
+float distTravelled = InterleavedGradientNoise(pixelCoords, (int)(_Time.y / max(HALF_EPS, unity_DeltaTime.x))) * _NoiseOffset;
+
+   [loop]
+for (int i = 0; i < maxSteps; ++i)
+{
+    if (distTravelled >= distLimit) break;
+
+    float3 rayPos = entryPoint + rayDir * distTravelled;
+
+    // 1) baked lighting at current position
+    float3 Li = SampleBakedLight(rayPos);
+    float presence = saturate(dot(Li, LUMA));  // 0..1
+
+    // 2) local density
+    float density = getDensity(rayPos);
 
     if (density > 0)
     {
-        float stepLen = _StepSize;
+        // Thin fog locally
+        float litDensity = lerp(density, density * (1.0 - _LightClearsFog * presence), _LightClearsFog);
 
-        // Thin the fog by baked light presence (constant along the ray)
-        float litDensity = lerp(density, density * (1.0 - _LightClearsFog * presence_const), _LightClearsFog);
-
-        // Single-scattering for this segment using baked lighting only (constant along the ray)
-        float3 scatterCol = _LightContribution.rgb * Li_const * (density * stepLen);
+        // Single scattering
+        float3 scatterCol = _LightContribution.rgb * Li * (density * stepLen);
         fogCol.rgb += transmittance * scatterCol;
 
-        // Extinction update
+        // Beer-Lambert
         transmittance *= exp(-litDensity * stepLen);
         if (transmittance < 1e-3) break;
     }
 
-    distTravelled += _StepSize;
-                }
+    distTravelled += stepLen;
+}
 
-                return lerp(sceneColor, fogCol, 1.0 - saturate(transmittance));
-            }
-
+return lerp(sceneColor, fogCol, 1.0 - saturate(transmittance));
+}
             ENDHLSL
         }
     }

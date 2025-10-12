@@ -24,7 +24,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BakedLightVolume:
-        m_Texture: {fileID: 11700000, guid: 70c58f2ba87fd71489c9ee60f9a5cbb1, type: 2}
+        m_Texture: {fileID: 11700000, guid: 0323d292bcb09db4f84234ca4014f0ec, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _FogNoise:
@@ -43,13 +43,14 @@ Material:
     - _LightClearsFog: 0.659
     - _LightScattering: 0.088
     - _MaxDistance: 200
+    - _MaxSteps: 256
     - _NoiseOffset: 1
     - _NoiseTiling: 6.4
     - _StepSize: 1
     - _UseBakedVolume: 1
     m_Colors:
-    - _BLV_Origin: {r: 1.46, g: 0.08, b: -331.2, a: 0}
-    - _BLV_Size: {r: 250, g: 15, b: 150, a: 0}
+    - _BLV_Origin: {r: -0.19999695, g: -22.790802, b: -335.3, a: 0}
+    - _BLV_Size: {r: 250, g: 39.981606, b: 155, a: 0}
     - _Color: {r: 0.29761472, g: 0.3699096, b: 0.9559748, a: 1}
     - _LightContribution: {r: 1, g: 0.5703092, b: 0.028301716, a: 1}
   m_BuildTextureStacks: []
