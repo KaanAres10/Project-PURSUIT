@@ -85,13 +85,21 @@ Shader "Unlit/VolumetricFog"
             float _MaxSteps;
 
 
-            float3 SampleBakedLight(float3 worldPos)
-            {
-                if (_UseBakedVolume < 0.5) return 0;
-                float3 uvw = (worldPos - _BLV_Origin) / max(_BLV_Size, 1e-5);
-                uvw = saturate(uvw);
-                return SAMPLE_TEXTURE3D(_BakedLightVolume, sampler_BakedLightVolume, uvw).rgb;
-            }
+           float3 SampleBakedLight(float3 worldPos)
+{
+    if (_UseBakedVolume < 0.5) return 0;
+
+    float3 bmin = _BLV_Origin;
+    float3 bmax = _BLV_Origin + _BLV_Size;
+
+    // HARD OUT-OF-BOX CUTOFF (no sampling, no light)
+    if (any(worldPos < bmin) || any(worldPos > bmax))
+        return 0;
+
+    // Inside: map to [0,1] WITHOUT saturate/clamp
+    float3 uvw = (worldPos - bmin) / max(_BLV_Size, 1e-5);
+    return SAMPLE_TEXTURE3D(_BakedLightVolume, sampler_BakedLightVolume, uvw).rgb;
+}
             
             
             float henyey_greenstein(float angle, float scattering)
