@@ -98,7 +98,7 @@ Shader "Unlit/VolumetricFog"
 
     // Inside: map to [0,1] WITHOUT saturate/clamp
     float3 uvw = (worldPos - bmin) / max(_BLV_Size, 1e-5);
-    return SAMPLE_TEXTURE3D(_BakedLightVolume, sampler_BakedLightVolume, uvw).rgb;
+    return SAMPLE_TEXTURE3D_LOD(_BakedLightVolume, sampler_BakedLightVolume, uvw, 0).rgb;
 }
             
             

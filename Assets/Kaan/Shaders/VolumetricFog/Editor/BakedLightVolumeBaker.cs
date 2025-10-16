@@ -206,6 +206,19 @@ public class BakedLightVolumeBaker : EditorWindow
 
         AssetDatabase.CreateAsset(tex, savePath);
         AssetDatabase.SaveAssets();
+        
+        var importer = AssetImporter.GetAtPath(savePath) as TextureImporter;
+        if (importer != null)
+        {
+            importer.textureShape   = TextureImporterShape.Texture3D;
+            importer.sRGBTexture    = false;                 // linear, not gamma
+            importer.mipmapEnabled  = false;                 // NO mipmaps (causes bands)
+            importer.filterMode     = FilterMode.Trilinear;  // smooth sampling
+            importer.wrapMode       = TextureWrapMode.Clamp; // no tiling across edges
+            importer.textureCompression = TextureImporterCompression.Uncompressed;
+            importer.anisoLevel     = 0;
+            importer.SaveAndReimport();
+        }
         AssetDatabase.Refresh();
 
         Debug.Log($"Baked 3D Light Volume saved to {savePath}  (res: {resX}×{resY}×{resZ}, mode: {probeMode})");
