@@ -24,7 +24,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BakedLightVolume:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 11700000, guid: 97ecf403949cad04ea6e7db289db8ab3, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _FogNoise:
@@ -41,7 +41,7 @@ Material:
     - _ConeAngleDeg: 70.6
     - _ConeLength: 20
     - _ConeSoft: 0
-    - _DensityMultiplier: 0.05
+    - _DensityMultiplier: 0.025
     - _DensityThreshold: 1
     - _EdgePad: 0.03
     - _LightClearsFog: 0.659
@@ -55,7 +55,7 @@ Material:
     - _StepSize: 1
     - _UseBakedVolume: 1
     m_Colors:
-    - _BLV_Origin: {r: 88.5975, g: -0.62026596, b: -346.42224, a: 0}
+    - _BLV_Origin: {r: 88.5975, g: -0.6702657, b: -346.42224, a: 0}
     - _BLV_Size: {r: 124.405, g: 9.520532, b: 160.4443, a: 0}
     - _Color: {r: 0.29761472, g: 0.3699096, b: 0.9559748, a: 1}
     - _ConeApex: {r: 0, g: 0, b: 0, a: 0}
