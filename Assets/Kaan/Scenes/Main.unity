@@ -2570,6 +2570,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1391787459}
     m_Modifications:
+    - target: {fileID: 3590383888194556667, guid: e01f80f1202db4b319c2c3775bbb652a,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5116418365285727927, guid: e01f80f1202db4b319c2c3775bbb652a,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -8329,7 +8334,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 8e2bb086f25dafd42b9e4a4439537642, type: 2}
+      objectReference: {fileID: 2100000, guid: 118006e014da9174493418391d27a10f, type: 2}
     m_RemovedComponents:
     - {fileID: 136720201252364104, guid: 0f06ecfa33f4cb348ab804a22c6de5ba, type: 3}
     m_RemovedGameObjects: []
@@ -10830,6 +10835,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trackerRaw: {fileID: 340647793}
   trackerScaled: {fileID: 1686545040}
+  heliBody: {fileID: 0}
+  spotlightBody: {fileID: 0}
   spawnPoint: {fileID: 1580858285}
   scaleFactor: 750
   scaleXZOnly: 0
