@@ -8,6 +8,8 @@ public class ProjectorTrackingScaler : MonoBehaviour
     [Header("References")]
     public Transform trackerRaw;
     public Transform trackerScaled;
+    public Transform heliBody;
+    public Transform spotlightBody;
     public Transform spawnPoint;
 
     [Header("Scaling")]
@@ -58,6 +60,19 @@ public class ProjectorTrackingScaler : MonoBehaviour
 
         Debug.Log("raw tracker" + trackerRaw.position);
         Debug.Log("post calc offset: " + offset);
+
+        heliBody.position = trackerScaled.position;
+
+        // --- Rotation ---
+        // Helicopter body: only yaw
+        Vector3 trackerEuler = trackerScaled.rotation.eulerAngles;
+        heliBody.rotation = Quaternion.Euler(0f, trackerEuler.y, 0f);
+
+        // Spotlight: full rotation (inherits from body, so it stays attached)
+        /*if (spotlightBody != null)
+        {
+            spotlightBody.rotation = trackerScaled.rotation;
+        }*/
 
     }
 }

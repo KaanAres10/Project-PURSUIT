@@ -30,6 +30,9 @@ public class SteeringMechanics : MonoBehaviour
     private InputAction brakeAction;
 
     private Rigidbody rb;
+    private Transform yAxisLockObj;
+    private float fixedY; // to remember the Y
+
 
     [Header("Steering wheel asset")]
     public Transform steeringWheelTransform;
@@ -38,6 +41,13 @@ public class SteeringMechanics : MonoBehaviour
 
     void Start()
     {
+        GameObject obj = GameObject.Find("YAxisLock");
+        if (obj != null)
+        {
+            yAxisLockObj = obj.transform;
+            fixedY = yAxisLockObj.position.y; // store its initial Y
+        }
+
         rb = GetComponent<Rigidbody>();
         Vector3 centerOfMass = rb.centerOfMass;
         centerOfMass.y += centreOfGravityOffset;
@@ -119,4 +129,19 @@ public class SteeringMechanics : MonoBehaviour
       
 
     }
+
+    void LateUpdate()
+    {
+        if (yAxisLockObj == null) return;
+
+        // Lock the Y position
+        Vector3 pos = yAxisLockObj.position;
+        yAxisLockObj.position = new Vector3(pos.x, fixedY, pos.z);
+
+        // Example: lock rotation so only Y-axis rotates
+        Vector3 rot = yAxisLockObj.rotation.eulerAngles;
+        yAxisLockObj.rotation = Quaternion.Euler(0f, rot.y, 0f);
+    }
+
+
 }
