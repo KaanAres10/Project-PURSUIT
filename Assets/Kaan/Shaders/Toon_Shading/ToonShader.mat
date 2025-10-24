@@ -11,7 +11,8 @@ Material:
   m_Shader: {fileID: 4800000, guid: 535e49790d8488d42bc952de063f1882, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - _EMISSION
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -27,13 +28,20 @@ Material:
         m_Texture: {fileID: 2800000, guid: 01e06aedf00e42a4c92dffdf030899f2, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
+        m_Texture: {fileID: 2800000, guid: 77e9d097f021dd94296fb1f14dc978ba, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _EmissionStrength: 1
     - _RimSharpness: 418
     - _Smoothness: 388.8
+    - _UseEmission: 1
     m_Colors:
     - RimColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 0.69182384, g: 0.69182384, b: 0.69182384, a: 1}
+    - _Color: {r: 0.19215685, g: 0.2502354, b: 0.5058824, a: 1}
+    - _EmissionColor: {r: 2048, g: 1603.9618, b: 0, a: 1}
     - _RimColor: {r: 0.8611373, g: 1, b: 0, a: 1}
-    - _WorldColor: {r: 0.5943395, g: 0.7054793, b: 1, a: 1}
+    - _WorldColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
