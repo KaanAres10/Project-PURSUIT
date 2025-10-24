@@ -163,6 +163,7 @@ for (int i = 0; i < maxSteps; ++i)
 
     // 1) baked lighting at current position
     float3 Li = SampleBakedLight(rayPos);
+    Li = min(Li, 10);
     float presence = saturate(dot(Li, LUMA));  // 0..1
 
     // 2) local density
