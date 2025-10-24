@@ -18,6 +18,7 @@ Shader "Unlit/VolumetricFog"
         _EdgePad("Edge padding", Range(0, 0.1)) = 0.03
         
         _LightClearsFog("Light clears fog", Range(0,1)) = 0
+<<<<<<< HEAD
         
         _BakedLightVolume("Baked Light Volume", 3D) = "black" {}
         _BLV_Origin("Volume Origin (world)", Vector) = (0,0,0,0)
@@ -26,6 +27,8 @@ Shader "Unlit/VolumetricFog"
         
         _MaxSteps("Max March Steps", Range(1,1024)) = 256
 
+=======
+>>>>>>> 525fa3102d7fc94aad854c94a790206c3e7f2c19
 
     }
     SubShader
@@ -39,8 +42,16 @@ Shader "Unlit/VolumetricFog"
             #pragma fragment frag
             #pragma multi_compile_instancing
             #pragma multi_compile _ _USE_DRAW_PROCEDURAL
+<<<<<<< HEAD
             #pragma multi_compile _ UNITY_SINGLE_PASS_STEREO
             
+=======
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _SHADOWS_SOFT
+            #pragma multi_compile _ UNITY_SINGLE_PASS_STEREO
+
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS           
+            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS     
+>>>>>>> 525fa3102d7fc94aad854c94a790206c3e7f2c19
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
@@ -75,6 +86,7 @@ Shader "Unlit/VolumetricFog"
 
             float _LightClearsFog;
 
+<<<<<<< HEAD
 
             TEXTURE3D(_BakedLightVolume);
             SAMPLER(sampler_BakedLightVolume);
@@ -101,6 +113,8 @@ Shader "Unlit/VolumetricFog"
     return SAMPLE_TEXTURE3D_LOD(_BakedLightVolume, sampler_BakedLightVolume, uvw, 0).rgb;
 }
             
+=======
+>>>>>>> 525fa3102d7fc94aad854c94a790206c3e7f2c19
             
             float henyey_greenstein(float angle, float scattering)
             {
@@ -122,22 +136,84 @@ half4 frag(Varyings IN): SV_TARGET
 {
     UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(IN);
 
+<<<<<<< HEAD
     float2 uv = IN.texcoord;
     #if defined(UNITY_SINGLE_PASS_STEREO)
     uv = UnityStereoTransformScreenSpaceTex(uv);
     #endif
     uv = pad01(uv, _EdgePad);
+=======
+                float2 uv = IN.texcoord;
+                #if defined(UNITY_SINGLE_PASS_STEREO)
+                    uv = UnityStereoTransformScreenSpaceTex(uv);
+                #endif
+                uv = pad01(uv, _EdgePad);
+
+                float4 sceneColor = SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, uv);
+                float depth = SampleSceneDepth(uv);
+                
+                float3 worldPos = ComputeWorldSpacePosition(uv, depth, UNITY_MATRIX_I_VP);
+>>>>>>> 525fa3102d7fc94aad854c94a790206c3e7f2c19
 
     float4 sceneColor = SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, uv);
     float depth = SampleSceneDepth(uv);
     float3 worldPos = ComputeWorldSpacePosition(uv, depth, UNITY_MATRIX_I_VP);
 
+<<<<<<< HEAD
     float3 entryPoint = _WorldSpaceCameraPos;
     float3 viewDir = worldPos - _WorldSpaceCameraPos;
     float viewLength = length(viewDir);
     float3 rayDir = normalize(viewDir);
 
     float2 pixelCoords = uv * _BlitTexture_TexelSize.zw;
+=======
+                float2 pixelCoords = uv * _BlitTexture_TexelSize.zw;
+                float distLimit = min(viewLength, _MaxDistance);
+                float distTravelled = InterleavedGradientNoise(pixelCoords, (int)(_Time.y / max(HALF_EPS, unity_DeltaTime.x))) * _NoiseOffset;
+                float transmittance = 1;
+                float4 fogCol = _Color;
+                
+
+                while (distTravelled < distLimit)
+                {
+                    float3 rayPos = entryPoint + rayDir * distTravelled; 
+                    float density = getDensity(rayPos);
+                    if (density > 0)
+                    {
+                        Light mainLight = GetMainLight(TransformWorldToShadowCoord(rayPos));
+                        fogCol.rgb += mainLight.color.rgb * _LightContribution.rgb * henyey_greenstein(dot(rayDir, mainLight.direction), _LightScattering) *  density * mainLight.shadowAttenuation * _StepSize;
+
+
+                        #ifdef _ADDITIONAL_LIGHTS
+                        int addCount = GetAdditionalLightsCount();
+                        float maxLightPresence = 0.0;
+                        [loop]
+                        for (int li = 0; li < addCount; li++)
+                        {
+                            Light L = GetAdditionalLight(li, rayPos);
+                            float cosTheat = dot(-rayDir, L.direction);
+                            float phase = henyey_greenstein(cosTheat, _LightScattering);
+                            float atten = L.distanceAttenuation;
+
+                            fogCol.rgb += L.color.rgb * _LightContribution.rgb * phase * density * atten * _StepSize;
+
+                            maxLightPresence = max(maxLightPresence, saturate(atten));
+                        }
+                        #endif
+                        
+                        
+                        float lightPresence = maxLightPresence; // 0..1
+                        float litDensity = lerp(density, density * (1.0 - _LightClearsFog * lightPresence), _LightClearsFog);
+
+                        // Single extinction update for the step
+                        transmittance *= exp(-litDensity * _StepSize);
+
+                        // (Minor perf win)
+                        if (transmittance < 1e-3) break;
+                    }
+                    distTravelled += _StepSize;
+                }
+>>>>>>> 525fa3102d7fc94aad854c94a790206c3e7f2c19
 
     float distLimit = min(viewLength, _MaxDistance);
 
