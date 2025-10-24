@@ -8,4 +8,5 @@ public class VrDrivingComfort : MonoBehaviour, ITunnelingVignetteProvider
     [SerializeField] VignetteParameters _params = new VignetteParameters();
 
     public VignetteParameters vignetteParameters => _params;
+
 }

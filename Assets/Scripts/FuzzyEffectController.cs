@@ -42,7 +42,6 @@ public class FuzzyEffectController : MonoBehaviour
     {
         currentSpeed = (trackerScaled.position - lastPosition).magnitude / Time.deltaTime;
         lastPosition = trackerScaled.position;
-        Debug.Log(currentSpeed);
 
         if(speedBar != null)
         {

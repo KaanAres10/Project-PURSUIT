@@ -12,9 +12,9 @@ public class SteeringMechanics : MonoBehaviour
     public VrDrivingComfort provider;
 
     [Header("Movement Settings")]
-    public float acceleration = 1000000f;
+   // public float acceleration = 1000000f;
     public float maxSpeed = 100f;
-    public float rotationSpeed = 100f;
+   // public float rotationSpeed = 100f;
     public float centreOfGravityOffset = -2f;
     public float motorTorque = 200000;
     public float brakeTorque = 100000;
@@ -42,6 +42,7 @@ public class SteeringMechanics : MonoBehaviour
     void Start()
     {
         GameObject obj = GameObject.Find("YAxisLock");
+        Debug.Log("found y axis lock");
         if (obj != null)
         {
             yAxisLockObj = obj.transform;
@@ -71,23 +72,29 @@ public class SteeringMechanics : MonoBehaviour
 
     void FixedUpdate()
     {
-        float throttle = throttleAction.ReadValue<float>();
+        float throttle = throttleAction.ReadValue<float>();  //0-1
         float steerLeft = steerLeftAction.ReadValue<float>();
         float steerRight = steerRightAction.ReadValue<float>();
-        float brake = brakeAction.ReadValue<float>();
-        float tmp = throttle - brake;
+        float brake = brakeAction.ReadValue<float>(); //0-1
+        int tmp = (int) (throttle - brake);  //to apply negative force if braking
+
 
         float forwardSpeed = Vector3.Dot(transform.forward, rb.velocity);
         float speedFactor = Mathf.InverseLerp(0, maxSpeed, forwardSpeed);
         float currentMotorTorque = Mathf.Lerp(motorTorque, 0, speedFactor);
         float currentSteerRange = Mathf.Lerp(steeringRange, steeringRangeAtMaxSpeed, speedFactor);
 
+        Debug.Log($"Speed:{forwardSpeed}  torque:{currentMotorTorque}  tmp:{tmp}");
+
+
         // Combine steering inputs
-        float steerInput = -2*steerLeft + steerRight; // needs to be calibrated to the steering wheel
+        float steerInput = -steerLeft + 1.5f*steerRight; // needs to be calibrated to the steering wheel
         float steerAngle = steerInput * currentSteerRange;
 
         // Apply steering to front wheels
         bool isAccelerating = Mathf.Sign(throttle) == Mathf.Sign(forwardSpeed);
+
+
 
         if (steeringWheelTransform != null)
         {
@@ -96,52 +103,83 @@ public class SteeringMechanics : MonoBehaviour
             Quaternion steeringRotation = Quaternion.Euler(0, wheelRotation, 0);
 
             steeringWheelTransform.localRotation = initialSteeringWheelRotation * steeringRotation;
+
+            
         }
 
 
         foreach (var wheel in wheels)
         {
+            Debug.Log("TQ " + wheel.WheelCollider.motorTorque + " BT " + wheel.WheelCollider.brakeTorque);
             if (wheel.steerable)
             {
                 wheel.WheelCollider.steerAngle = steerAngle;
             }
 
-            if (wheel.motorized)
+            if(tmp == 1 && forwardSpeed >= 0)
             {
-                wheel.WheelCollider.motorTorque = tmp * currentMotorTorque;
+                wheel.WheelCollider.brakeTorque = 0f;
+                if (wheel.motorized)
+                {
+                    wheel.WheelCollider.motorTorque = tmp * currentMotorTorque;
+                }
             }
-        }
 
-        float rbspeed = rb.velocity.magnitude;
+            else if (tmp == -1 && forwardSpeed >= 0)
+            {
+               
+                wheel.WheelCollider.motorTorque = 0f;
+                wheel.WheelCollider.brakeTorque = Mathf.Abs(tmp) * brakeTorque;
+            }
+            else if (tmp == -1 && forwardSpeed < 0)
+            {
+                wheel.WheelCollider.brakeTorque = 0f;
+                if (wheel.motorized)
+                {
+                    wheel.WheelCollider.motorTorque = tmp * currentMotorTorque;
+                }
+            }
+
+            else if (tmp == 1 && forwardSpeed < 0)
+            {
+                wheel.WheelCollider.motorTorque = 0f;
+                wheel.WheelCollider.brakeTorque = Mathf.Abs(tmp) * brakeTorque;
+            }
+            if (tmp == 0)
+            {
+    
+                wheel.WheelCollider.motorTorque = 0f;
+                
+                wheel.WheelCollider.brakeTorque = 0.3f * brakeTorque;
+            }
+
+
+
+            float rbspeed = rb.velocity.magnitude;
         float angSpeed = rb.angularVelocity.magnitude * Mathf.Rad2Deg;
 
         
-        if (rbspeed > 10.0f || angSpeed > 20.0f)
+        if (tmp == 1 || tmp == -1)
         {
             vignette.BeginTunnelingVignette(provider);
             Debug.Log("Vignette Activated");
         }
         else
         {
-            Debug.Log("vignette off");
+            
             vignette.EndTunnelingVignette(provider);
+            //Debug.Log("vignette off");
         }
-      
 
-    }
+            Vector3 pos = yAxisLockObj.position;
+            yAxisLockObj.position = new Vector3(pos.x, fixedY, pos.z);
 
-    void LateUpdate()
-    {
-        if (yAxisLockObj == null) return;
-
-        // Lock the Y position
-        Vector3 pos = yAxisLockObj.position;
-        yAxisLockObj.position = new Vector3(pos.x, fixedY, pos.z);
-
-        // Example: lock rotation so only Y-axis rotates
-        Vector3 rot = yAxisLockObj.rotation.eulerAngles;
-        yAxisLockObj.rotation = Quaternion.Euler(0f, rot.y, 0f);
-    }
+            // Example: lock rotation so only Y-axis rotates
+            Vector3 rot = yAxisLockObj.rotation.eulerAngles;
+            yAxisLockObj.rotation = Quaternion.Euler(0f, rot.y, 0f);
 
 
-}
+        }
+
+
+}}
