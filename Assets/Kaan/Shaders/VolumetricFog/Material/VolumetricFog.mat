@@ -12,7 +12,8 @@ Material:
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
-  m_InvalidKeywords: []
+  m_InvalidKeywords:
+  - _USE_BAKED_VOLUME
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 1
@@ -48,12 +49,14 @@ Material:
     - _FogHeightMax: 200
     - _FogHeightMin: 0
     - _LightClearsFog: 0.659
+    - _LightDistanceBoost: 1
+    - _LightDistanceScale: 15
     - _LightScattering: 0.088
-    - _LightVisibility: 1.12
+    - _LightVisibility: 1.36
     - _MaskBlocksFog: 0
     - _MaskBlocksLight: 1
-    - _MaxDistance: 200
-    - _MaxSteps: 256
+    - _MaxDistance: 50
+    - _MaxSteps: 30
     - _NoiseOffset: 1
     - _NoiseTiling: 6.4
     - _StepSize: 1
@@ -61,8 +64,8 @@ Material:
     m_Colors:
     - _BLV_Origin: {r: -513.7346, g: -3.076385, b: -1062.41, a: 0}
     - _BLV_Size: {r: 1939.469, g: 90.15277, b: 1946.82, a: 0}
-    - _Color: {r: 0.29761472, g: 0.3699096, b: 0.9559748, a: 1}
+    - _Color: {r: 0, g: 0, b: 0, a: 1}
     - _ConeApex: {r: 0, g: 0, b: 0, a: 0}
     - _ConeDir: {r: 0, g: -1, b: 0, a: 0}
-    - _LightContribution: {r: 1, g: 0.5703092, b: 0.028301716, a: 1}
+    - _LightContribution: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
