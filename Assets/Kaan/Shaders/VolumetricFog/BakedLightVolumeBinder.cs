@@ -81,7 +81,7 @@ public class BakedLightVolumeBinder : MonoBehaviour
         Gizmos.DrawWireCube(origin + 0.5f * size, size);
     }
 
-    void Apply()
+    public void Apply()
     {
         if (!fogMaterial) return;
         fogMaterial.SetTexture("_BakedLightVolume", bakedVolume);
