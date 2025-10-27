@@ -3,7 +3,14 @@ guid: db3a6499ddfc5c049bc93602e9f01e57
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
+<<<<<<< HEAD
+  defaultReferences:
+  - bakedAsset: {fileID: 11400000, guid: 0db9fbe40066e2b40950a9452764e47c, type: 2}
+  - bakedLights: {fileID: 11400000, guid: 3b21e5c147354904286788e01392c583, type: 2}
+  - fogMaterial: {fileID: 2100000, guid: be7041ef35881c147b9f7de449639e50, type: 2}
+=======
   defaultReferences: []
+>>>>>>> 525fa3102d7fc94aad854c94a790206c3e7f2c19
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
