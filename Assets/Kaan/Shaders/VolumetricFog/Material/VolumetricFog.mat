@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: VolumetricFog
+  m_Shader: {fileID: 4800000, guid: 1077fa2c1ebe865428e3c73cebf7fa25, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 1
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BakedLightVolume:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FogNoise:
+        m_Texture: {fileID: 11700000, guid: 1174c120428e59a4598294aa1634a598, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: -225.15, y: 1}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _BLV_EdgeFadeMeters: 0.5
+    - _ConeAngleDeg: 70.6
+    - _ConeLength: 20
+    - _ConeSoft: 0
+    - _DensityMultiplier: 0.025
+    - _DensityThreshold: 1
+    - _EdgePad: 0.03
+    - _LightClearsFog: 0.659
+    - _LightScattering: 0.088
+    - _MaskBlocksFog: 0
+    - _MaskBlocksLight: 1
+    - _MaxDistance: 200
+    - _MaxSteps: 256
+    - _NoiseOffset: 1
+    - _NoiseTiling: 6.4
+    - _StepSize: 1
+    - _UseBakedVolume: 1
+    m_Colors:
+    - _BLV_Origin: {r: 88.5975, g: -0.6702657, b: -346.42224, a: 0}
+    - _BLV_Size: {r: 124.405, g: 9.520532, b: 160.4443, a: 0}
+    - _Color: {r: 0.29761472, g: 0.3699096, b: 0.9559748, a: 1}
+    - _ConeApex: {r: 0, g: 0, b: 0, a: 0}
+    - _ConeDir: {r: 0, g: -1, b: 0, a: 0}
+    - _LightContribution: {r: 1, g: 0.5703092, b: 0.028301716, a: 1}
+  m_BuildTextureStacks: []
