@@ -3,7 +3,107 @@ guid: bf566535579eb60439a58e65297109c0
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: GreenScreen.001
+    second: {fileID: 2100000, guid: ceb650c3a4e0c453c86d73c362f453da, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Leather
+    second: {fileID: 2100000, guid: 80c313b86b3444f908a2b325bdd09f48, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Light
+    second: {fileID: 2100000, guid: 104c778c685054251998d29bf2027db1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.001
+    second: {fileID: 2100000, guid: f1d1f76bccef14424bf95b68fbb66ff5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.002
+    second: {fileID: 2100000, guid: cc8a461cb19ee4bfb9b9352fcc5453ec, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.003
+    second: {fileID: 2100000, guid: 57d5667522ac04473918b0d00c032068, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.004
+    second: {fileID: 2100000, guid: 475a32bb2e4254462af508af370d81c3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.005
+    second: {fileID: 2100000, guid: 24af75dcde0a34217906098eb40ee776, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.011
+    second: {fileID: 2100000, guid: 62cc07053803b49c68edb809f91a898e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.Ledlight
+    second: {fileID: 2100000, guid: 331cbbbb0c8c04d8bbfe045edc3a3a25, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PaletteMaterial.001
+    second: {fileID: 2100000, guid: 0aee87629c7e24225afeb88e8c62f584, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SideScreensDisplay.001
+    second: {fileID: 2100000, guid: 7f5ffbba728704204a3078afc1a594a3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: black
+    second: {fileID: 2100000, guid: a0425192a815346d58263b3a61ec3b04, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: color
+    second: {fileID: 2100000, guid: 6267817a06c274dfd8d5a6fa7ecf701c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: elements
+    second: {fileID: 2100000, guid: 349bcd74a2b3d47c58660b8e688161c0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: mirror
+    second: {fileID: 2100000, guid: fef114e1936b4460db3e205469823bfe, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: stops
+    second: {fileID: 2100000, guid: df3a4464ed51c493a89f899e6c2f4d93, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: tyre
+    second: {fileID: 2100000, guid: 33c6c0b2440b4467ab709f4b4a96e08b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wheel
+    second: {fileID: 2100000, guid: 4a12ff5f0aa11422ebd2a6ee5a6fdd56, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: window inside
+    second: {fileID: 2100000, guid: b711b331082ce434bb66e6eeae861563, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -48,7 +148,7 @@ ModelImporter:
     nodeNameCollisionStrategy: 1
     fileIdsGeneration: 2
     swapUVChannels: 0
-    generateSecondaryUV: 1
+    generateSecondaryUV: 0
     useFileUnits: 1
     keepQuads: 0
     weldVertices: 1
