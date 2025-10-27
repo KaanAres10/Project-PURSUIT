@@ -8,8 +8,6 @@ public class SteeringMechanics : MonoBehaviour
 {
     [Header("References")]
     public InputActionAsset inputActions;
-    public TunnelingVignetteController vignette;
-    public VrDrivingComfort provider;
 
     [Header("Movement Settings")]
     public float acceleration = 1000000f;
@@ -83,11 +81,18 @@ public class SteeringMechanics : MonoBehaviour
         float currentSteerRange = Mathf.Lerp(steeringRange, steeringRangeAtMaxSpeed, speedFactor);
 
         // Combine steering inputs
-        float steerInput = -2*steerLeft + steerRight; // needs to be calibrated to the steering wheel
+        float steerInput = -1f * steerLeft + 1.5f * steerRight; // needs to be calibrated to the steering wheel
         float steerAngle = steerInput * currentSteerRange;
 
         // Apply steering to front wheels
-        bool isAccelerating = Mathf.Sign(throttle) == Mathf.Sign(forwardSpeed);
+       // bool isAccelerating = Mathf.Sign(throttle) == Mathf.Sign(forwardSpeed);
+
+        Vector3 pos = yAxisLockObj.position;
+        yAxisLockObj.position = new Vector3(pos.x, fixedY, pos.z);
+
+        // Example: lock rotation so only Y-axis rotates
+        Vector3 rot = yAxisLockObj.rotation.eulerAngles;
+        yAxisLockObj.rotation = Quaternion.Euler(0f, rot.y, 0f);
 
         if (steeringWheelTransform != null)
         {
@@ -98,49 +103,67 @@ public class SteeringMechanics : MonoBehaviour
             steeringWheelTransform.localRotation = initialSteeringWheelRotation * steeringRotation;
         }
 
+        Debug.Log("tmp: " + tmp + "speed: " + forwardSpeed);
+
 
         foreach (var wheel in wheels)
         {
+
+
             if (wheel.steerable)
             {
                 wheel.WheelCollider.steerAngle = steerAngle;
             }
 
-            if (wheel.motorized)
+
+            
+            if (tmp == 1 && forwardSpeed >= -1e5f)
             {
-                wheel.WheelCollider.motorTorque = tmp * currentMotorTorque;
+
+                wheel.WheelCollider.brakeTorque = 0;
+
+                if (wheel.motorized)
+                {
+                    wheel.WheelCollider.motorTorque = tmp * currentMotorTorque;
+                }
             }
-        }
 
-        float rbspeed = rb.velocity.magnitude;
-        float angSpeed = rb.angularVelocity.magnitude * Mathf.Rad2Deg;
+            else if (tmp == -1 && forwardSpeed >= 0) //if braking while going forward
+            {
 
-        
-        if (rbspeed > 10.0f || angSpeed > 20.0f)
-        {
-            vignette.BeginTunnelingVignette(provider);
-            Debug.Log("Vignette Activated");
-        }
-        else
-        {
-            Debug.Log("vignette off");
-            vignette.EndTunnelingVignette(provider);
+                wheel.WheelCollider.motorTorque = 0;
+                wheel.WheelCollider.brakeTorque = brakeTorque;
+
+            }
+
+            else if (tmp == 1 && forwardSpeed <= 1)
+            {
+
+                wheel.WheelCollider.motorTorque = 0;
+                wheel.WheelCollider.brakeTorque = brakeTorque;
+
+            }
+
+            else if (tmp == -1 && forwardSpeed < 1)
+            {
+                wheel.WheelCollider.brakeTorque = 0;
+                if (wheel.motorized)
+                {
+                    Debug.Log("reversing");
+                    wheel.WheelCollider.motorTorque = tmp * currentMotorTorque;
+                }
+            }
+
+            else if (tmp == 0)
+            {
+                wheel.WheelCollider.motorTorque = 0;
+                wheel.WheelCollider.brakeTorque = 0.3f * brakeTorque;
+            }
+            
+
         }
       
 
-    }
-
-    void LateUpdate()
-    {
-        if (yAxisLockObj == null) return;
-
-        // Lock the Y position
-        Vector3 pos = yAxisLockObj.position;
-        yAxisLockObj.position = new Vector3(pos.x, fixedY, pos.z);
-
-        // Example: lock rotation so only Y-axis rotates
-        Vector3 rot = yAxisLockObj.rotation.eulerAngles;
-        yAxisLockObj.rotation = Quaternion.Euler(0f, rot.y, 0f);
     }
 
 

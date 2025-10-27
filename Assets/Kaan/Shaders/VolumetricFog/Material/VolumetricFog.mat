@@ -25,7 +25,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BakedLightVolume:
-        m_Texture: {fileID: 11700000, guid: 29ba87d09c112d84f8396951fa9b4e28, type: 2}
+        m_Texture: {fileID: 11700000, guid: edec6280eeb824643b8864a5adcd7c7e, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _FogNoise:

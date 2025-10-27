@@ -18,7 +18,6 @@ public class SpotlightDetector : MonoBehaviour
     public LayerMask obstructionMask;
 
     public UiManager uiManager;
-    public FuzzyEffectController fuzzyController;
 
     private float detectionTimer = 0f;
 
