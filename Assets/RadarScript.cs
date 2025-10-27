@@ -16,7 +16,7 @@ public class RadarScript : MonoBehaviour
     void Start()
     {
         // Find the player
-        player = GameObject.Find("Sports Car")?.transform;
+        player = GameObject.Find("Sports Car 2")?.transform;
         if (player == null) Debug.LogError("Sports Car not found!");
 
         // Find the helicopter's tracker
@@ -35,19 +35,21 @@ public class RadarScript : MonoBehaviour
         if (player == null || target == null || targetDot == null)
             return;
 
-        // Offset in world space
+        // World-space offset
         Vector3 offset = target.position - player.position;
 
+        // Convert to player's local space (so it rotates with the player)
+        Vector3 localOffset = player.InverseTransformDirection(offset);
+
         // Only XZ plane
-        Vector2 offset2D = new Vector2(offset.x, offset.z);
+        Vector2 offset2D = new Vector2(localOffset.x, localOffset.z);
 
         // Scale and clamp
         Vector2 radarPos = offset2D / radarRange * radarScale;
         if (radarPos.magnitude > radarScale)
             radarPos = radarPos.normalized * radarScale;
 
-        // Move dot relative to radar origin (green dot center)
-        // Apply tiny Z offset so red dot renders on top
+        // Apply to radar dot (relative to radar center)
         targetDot.localPosition = new Vector3(radarPos.x, radarPos.y, targetZOffset);
     }
 }
