@@ -20450,6 +20450,21 @@ PrefabInstance:
       propertyPath: m_Name
       value: Sports Car
       objectReference: {fileID: 0}
+    - target: {fileID: 6941763855395747781, guid: 2b2b9ddf02b53f04fb45dcbd0c0b8295,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 0f7d5f492ed32c945add07b0f38df9a8, type: 2}
+    - target: {fileID: 6952142863537011106, guid: 2b2b9ddf02b53f04fb45dcbd0c0b8295,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.456
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952142863537011106, guid: 2b2b9ddf02b53f04fb45dcbd0c0b8295,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1.285
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
