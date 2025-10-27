@@ -14,6 +14,11 @@ CBUFFER_START(UnityPerMaterial)
     float _RimSharpness;
     float3 _RimColor;
     float3 _WorldColor;
+    TEXTURE2D(_EmissionMap);
+    SAMPLER(sampler_EmissionMap);
+    float4 _EmissionMap_ST;
+    float3 _EmissionColor;
+    float  _EmissionStrength;
 CBUFFER_END
 
 struct Attributes
@@ -32,6 +37,7 @@ struct Varyings
     float3 positionWS: TEXCOORD1;
     float3 normalWS: TEXCOORD2;
     float3 viewDirectionWS: TEXCOORD3;
+    float2 uvEM         : TEXCOORD4;
 
     UNITY_VERTEX_INPUT_INSTANCE_ID
          UNITY_VERTEX_OUTPUT_STEREO    
@@ -102,7 +108,8 @@ Varyings Vertex(Attributes IN)
     OUT.normalWS = TransformObjectToWorldNormal(IN.normalOS);
     OUT.positionHCS = GetClipSpacePosition(OUT.positionWS, OUT.normalWS);
     OUT.uv = TRANSFORM_TEX(IN.uv, _ColorMap);
-
+    OUT.uvEM = TRANSFORM_TEX(IN.uv, _EmissionMap);
+    
     return OUT;
 }
 
@@ -166,7 +173,14 @@ float3 Fragment(Varyings IN) : SV_Target
     finalLighting += rimLighting;
     finalLighting += _WorldColor;
     
-    return surfaceColor * finalLighting;
+    float3 litColor = surfaceColor * finalLighting;
+    
+    #if defined(_EMISSION)
+        float3 emisTex = SAMPLE_TEXTURE2D(_EmissionMap, sampler_EmissionMap, IN.uvEM).rgb;
+        float3 emission = _EmissionStrength * _EmissionColor * emisTex;
+        litColor += emission;
+    #endif
+    return litColor;
 }
 
 #endif

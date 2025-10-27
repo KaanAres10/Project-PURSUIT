@@ -8,6 +8,11 @@ Shader "Unlit/ToonShader"
         _RimSharpness ("Rim Sharpness", Float) = 16.0
         [HDR] _RimColor ("Rim Color", Color) = (1.0, 1.0, 1.0)
         _WorldColor ("World Color", Color) = (0.1, 0.1, 0.1)
+        
+        [Toggle(_EMISSION)] _UseEmission ("Use Emission", Float) = 0
+        [HDR] _EmissionColor ("Emission Color", Color) = (0,0,0,1)
+        _EmissionMap ("Emission Map", 2D) = "black" {}
+        _EmissionStrength ("Emission Strength", Float) = 1
     }
     SubShader
     {
@@ -30,6 +35,8 @@ Shader "Unlit/ToonShader"
            
            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
            #pragma multi_compile _ _SHADOWS_SOFT
+
+           #pragma shader_feature _EMISSION
 
            #pragma vertex Vertex
            #pragma fragment Fragment
