@@ -26,6 +26,11 @@ Shader "Unlit/VolumetricFog"
         
         _MaxSteps("Max March Steps", Range(1,1024)) = 256
 
+        _FogHeightMin("Fog Min Height", Float) = 0
+        _FogHeightMax("Fog Max Height", Float) = 5
+        _FogHeightFalloff("Fog Falloff Sharpness", Range(0.1, 10)) = 1
+        
+        _LightVisibility("Light Visibility Boost", Range(0, 5)) = 1
 
     }
     SubShader
@@ -83,6 +88,12 @@ Shader "Unlit/VolumetricFog"
             float  _UseBakedVolume;
 
             float _MaxSteps;
+
+            float _FogHeightMin;
+            float _FogHeightMax;
+        float _FogHeightFalloff;
+
+            float _LightVisibility;
 
 
            float3 SampleBakedLight(float3 worldPos)
@@ -160,14 +171,16 @@ for (int i = 0; i < maxSteps; ++i)
     if (distTravelled >= distLimit) break;
 
     float3 rayPos = entryPoint + rayDir * distTravelled;
+    float heightFade = saturate(1.0 - smoothstep(_FogHeightMin, _FogHeightMax, rayPos.y));
+    heightFade = pow(heightFade, _FogHeightFalloff); // control sharpness
 
     // 1) baked lighting at current position
     float3 Li = SampleBakedLight(rayPos);
-    Li = min(Li, 10);
+    Li = min(Li, 1000);
     float presence = saturate(dot(Li, LUMA));  // 0..1
 
     // 2) local density
-    float density = getDensity(rayPos);
+    float density = getDensity(rayPos) * heightFade;
 
     if (density > 0)
     {
@@ -175,7 +188,7 @@ for (int i = 0; i < maxSteps; ++i)
         float litDensity = lerp(density, density * (1.0 - _LightClearsFog * presence), _LightClearsFog);
 
         // Single scattering
-        float3 scatterCol = _LightContribution.rgb * Li * (density * stepLen);
+        float3 scatterCol = _LightContribution.rgb * Li * _LightVisibility * (density * stepLen);
         fogCol.rgb += transmittance * scatterCol;
 
         // Beer-Lambert

@@ -221,6 +221,23 @@ public class BakedLightVolumeBaker : EditorWindow
         }
         AssetDatabase.Refresh();
 
-        Debug.Log($"Baked 3D Light Volume saved to {savePath}  (res: {resX}×{resY}×{resZ}, mode: {probeMode})");
+        var bakedTex = AssetDatabase.LoadAssetAtPath<Texture3D>(savePath);
+        if (bakedTex == null)
+        {
+            Debug.LogError("Failed to load baked Texture3D after saving!");
+            return;
+        }
+        
+        var binder = Object.FindObjectOfType<BakedLightVolumeBinder>();
+        if (binder != null)
+        {
+            binder.bakedVolume = bakedTex;
+            binder.origin = origin;
+            binder.size = size;
+            binder.useBakedVolume = true;
+            binder.Apply();
+
+            EditorUtility.SetDirty(binder);
+        }
     }
 }
