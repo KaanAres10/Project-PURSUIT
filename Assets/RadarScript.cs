@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 public class RadarScript : MonoBehaviour
@@ -7,8 +8,12 @@ public class RadarScript : MonoBehaviour
     public float radarScale = 7.0f;    // Max distance the dot moves from center
 
     [Header("Radar Dots")]
-    public Transform targetDot;       // HeliDot (now a sibling of CarDot)
+    public Transform targetDot;       // HeliDot
     public float targetZOffset = -0.1f; // small offset to render on top of green dot
+
+    [Header("UI Display")]
+    public TMP_Text distanceText;      // Assign in the Inspector (TextMeshPro text)
+
 
     private Transform player;         // Sports Car
     private Transform target;         // Helicopter's TrackerScaled
@@ -51,5 +56,14 @@ public class RadarScript : MonoBehaviour
 
         // Apply to radar dot (relative to radar center)
         targetDot.localPosition = new Vector3(radarPos.x, radarPos.y, targetZOffset);
+
+        // Calculate and display world distance
+        float distance = offset2D.magnitude;
+
+        Debug.Log($"[Radar] Distance to target: {distance:F1} meters");
+
+        // Show in UI 
+        if (distanceText != null)
+            distanceText.text = $" {distance:F1} m";
     }
 }
