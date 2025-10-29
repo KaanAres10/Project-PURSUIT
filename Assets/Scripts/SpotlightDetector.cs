@@ -9,22 +9,32 @@ public class SpotlightDetector : MonoBehaviour
     [Header("Setup")]
     public Light spotlight;
     public Transform car;
-    public Image uiFillBar;
-    private Renderer hornRenderer;
+    public Image HeliUIFillBar;
+    public Image CarUIFillBar;
+    private Renderer buttonsRenderer;
     private Renderer leatherRenderer;
+    private Renderer screenRenderer;
+    private Renderer screenBoarderRenderer;
+    private Renderer textRenderer;
+    private Renderer wheelRenderer;
 
     [Header("Detection Settings")]
     public float requiredTime = 5f;
+    public float decaySpeed = 1.5f;
+    public float detectionRange = 400f;
+    public float spotAngle = 20f;
     public LayerMask obstructionMask;
 
     public UiManager uiManager;
-    public FuzzyEffectController fuzzyController;
 
     private float detectionTimer = 0f;
 
     [Header("Steering Wheel warnings")]
     public Color detectedColor = Color.red;
     public Color hiddenColor = Color.green;
+    public Color screenColor;
+    public Color screenEmission;
+
 
     // Update is called once per frame
 
@@ -35,25 +45,21 @@ public class SpotlightDetector : MonoBehaviour
             car = carObj.transform;
 
             // Search for steering_green among children
-            Transform steering = car.Find("steering_green");
+            Transform steering = car.Find("steering_v2");
             if (steering == null)
             {
-                Debug.LogError("steering_green not found under Car");
+                Debug.LogError("steering_v2 not found under Car");
              
             }
             // Search for horn and leather under steering
-            hornRenderer = steering.Find("horn")?.GetComponent<Renderer>();
+            buttonsRenderer = steering.Find("Buttons")?.GetComponent<Renderer>();
             leatherRenderer = steering.Find("Leather")?.GetComponent<Renderer>();
-            Debug.Log(hornRenderer);
-
-            if (hornRenderer == null)
-            {
-                Debug.Log("horn not found under Car");
-            }
-            if (leatherRenderer == null)
-            {
-                Debug.Log("Leather not found under Car");
-            }
+            screenRenderer = steering.Find("Screen")?.GetComponent<Renderer>();
+            screenBoarderRenderer = steering.Find("ScreenBoarder")?.GetComponent<Renderer>();
+            textRenderer = steering.Find("Text")?.GetComponent<Renderer>();
+            wheelRenderer = steering.Find("Wheel")?.GetComponent<Renderer>();
+            screenColor = screenRenderer.material.GetColor("_BaseColor");
+            screenEmission = screenRenderer.material.GetColor("_EmissionColor");
         }
         else
             Debug.LogError("Car not found! Make sure it has tag 'Car'.");
@@ -61,21 +67,31 @@ public class SpotlightDetector : MonoBehaviour
 
     void Update()
     {
+
         if (CarInSpotlight())
         {
             Debug.Log("Can see youoooooo");
            
             detectionTimer += Time.deltaTime;
 
-            if (hornRenderer != null) {
-                hornRenderer.material.SetColor("_BaseColor", detectedColor);
-                hornRenderer.material.SetColor("_EmissionColor", detectedColor);
-            }
-            if (leatherRenderer != null)
-            {
-                leatherRenderer.material.SetColor("_BaseColor", detectedColor);
-                leatherRenderer.material.SetColor("_EmissionColor", detectedColor);
-            }
+            buttonsRenderer.material.SetColor("_BaseColor", detectedColor);
+            buttonsRenderer.material.SetColor("_EmissionColor", detectedColor);
+          
+            leatherRenderer.material.SetColor("_BaseColor", detectedColor);
+            leatherRenderer.material.SetColor("_EmissionColor", detectedColor);
+
+            screenBoarderRenderer.material.SetColor("_BaseColor", detectedColor);
+            screenBoarderRenderer.material.SetColor("_EmissionColor", detectedColor);
+
+            textRenderer.material.SetColor("_BaseColor", detectedColor);
+            textRenderer.material.SetColor("_EmissionColor", detectedColor);
+
+ 
+
+     
+
+
+
 
             if (detectionTimer >= requiredTime)
             {
@@ -84,30 +100,38 @@ public class SpotlightDetector : MonoBehaviour
         }
         else
         {
-            detectionTimer = 0f;
+            detectionTimer -= Time.deltaTime * decaySpeed;
+            detectionTimer = Mathf.Clamp(detectionTimer, 0f, requiredTime);
 
-            if (hornRenderer != null)
-            {
-                hornRenderer.material.SetColor("_BaseColor", hiddenColor);
-                hornRenderer.material.SetColor("_EmissionColor", hiddenColor);
-            }
-            if (leatherRenderer != null)
-            {
-                leatherRenderer.material.SetColor("_BaseColor", hiddenColor);
-                leatherRenderer.material.SetColor("_EmissionColor", hiddenColor);
-            }
+            buttonsRenderer.material.SetColor("_BaseColor", hiddenColor);
+            buttonsRenderer.material.SetColor("_EmissionColor", hiddenColor);
+
+            leatherRenderer.material.SetColor("_BaseColor", hiddenColor);
+            leatherRenderer.material.SetColor("_EmissionColor", hiddenColor);
+
+            screenBoarderRenderer.material.SetColor("_BaseColor", hiddenColor);
+            screenBoarderRenderer.material.SetColor("_EmissionColor", hiddenColor);
+
+            textRenderer.material.SetColor("_BaseColor", screenColor);
+            textRenderer.material.SetColor("_EmissionColor", screenEmission);
+
 
         }
 
-        if (uiFillBar != null) 
+        if (HeliUIFillBar != null) 
         {
-            uiFillBar.fillAmount = detectionTimer / requiredTime;
+            HeliUIFillBar.fillAmount = detectionTimer / requiredTime;
+        }
+
+        if (CarUIFillBar != null)
+        {
+            CarUIFillBar.fillAmount = detectionTimer / requiredTime;
         }
 
 
     }
 
-    bool CarInSpotlight()
+    public bool CarInSpotlight()
     {
         Vector3 toCar = (car.position - spotlight.transform.position);
         float distance = toCar.magnitude;
@@ -116,16 +140,16 @@ public class SpotlightDetector : MonoBehaviour
 
         //Angle check
         float angle = Vector3.Angle(spotlight.transform.forward, dirToCar);
-        if (angle > spotlight.spotAngle / 2f) return false;
+        if (angle > spotAngle) return false;
 
         //Distance check
-        if(distance > spotlight.range) return false;
+        if(distance > detectionRange) return false;
 
         Debug.Log("Angle:" + angle + "Distance: " + distance);
-        Debug.Log("necessary spot angle: " + spotlight.spotAngle / 2f);
+        Debug.Log("necessary spot angle: " + spotAngle );
 
         //raycast for blockage
-        if (Physics.Raycast(spotlight.transform.position, dirToCar, out RaycastHit hit, spotlight.range, ~0))
+        if (Physics.Raycast(spotlight.transform.position, dirToCar, out RaycastHit hit, detectionRange, ~0))
         {
             //if ray hits the car, success
             if (hit.transform == car) return true;
@@ -142,9 +166,13 @@ public class SpotlightDetector : MonoBehaviour
 
     void ProjectorPlayerWins()
     {
-        Debug.Log("Projector Player Wins!");
-        uiManager.ShowWinUI();
+        
+            Debug.Log("Projector Player Wins!");
+            GameManager.Instance.HeliWins();
+        
+
     }
+
 
     private void OnDrawGizmos()
     {
