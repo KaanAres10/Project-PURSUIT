@@ -33,7 +33,7 @@ MonoBehaviour:
   m_Name: VolumetricFogFeature
   m_EditorClassIdentifier: 
   m_Active: 1
-  injectionPoint: 550
+  injectionPoint: 450
   fogMaterial: {fileID: 2100000, guid: be7041ef35881c147b9f7de449639e50, type: 2}
   passIndex: 0
   downsample: 1

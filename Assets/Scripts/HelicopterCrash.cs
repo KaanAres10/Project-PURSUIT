@@ -8,7 +8,7 @@ public class HelicopterCrash : MonoBehaviour
     public LayerMask crashLayers;
     public UiManager uiManager;
     public int maxLives = 3;
-    public float flashDuration = 0.3f;
+    public float flashDuration = 2f;
     public float recoveryTime = 2f;
 
     [Header("UI Elements")]
@@ -76,8 +76,7 @@ public class HelicopterCrash : MonoBehaviour
     private void GameOver()
     {
         isGameOver = true;
-        Debug.Log("Helicopter destroyed — Game Over!");
-        uiManager?.ShowCrashUI();
+        GameManager.Instance.HeliCrashed();
     }
 
     private IEnumerator FlashScreenRed()

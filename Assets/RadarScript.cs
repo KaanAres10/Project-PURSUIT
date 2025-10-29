@@ -48,7 +48,7 @@ public class RadarScript : MonoBehaviour
 
         // Only XZ plane
         Vector2 offset2D = new Vector2(localOffset.x, localOffset.z);
-
+        //Debug.Log($"[Radar] Distance to target: {offset2D.magnitude / 10.0f:F1} meters");
         // Scale and clamp
         Vector2 radarPos = offset2D / radarRange * radarScale;
         if (radarPos.magnitude > radarScale)
@@ -57,13 +57,8 @@ public class RadarScript : MonoBehaviour
         // Apply to radar dot (relative to radar center)
         targetDot.localPosition = new Vector3(radarPos.x, radarPos.y, targetZOffset);
 
-        // Calculate and display world distance
-        float distance = offset2D.magnitude;
-
-        Debug.Log($"[Radar] Distance to target: {distance:F1} meters");
-
         // Show in UI 
         if (distanceText != null)
-            distanceText.text = $" {distance:F1} m";
+            distanceText.text = $" {offset2D.magnitude / 10.0f:F1} m";
     }
 }

@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -8,6 +9,7 @@ public class SteeringMechanics : MonoBehaviour
 {
     [Header("References")]
     public InputActionAsset inputActions;
+    public TextMeshProUGUI speedText;
 
     [Header("Movement Settings")]
     public float acceleration = 1000000f;
@@ -162,9 +164,20 @@ public class SteeringMechanics : MonoBehaviour
             
 
         }
-      
 
+        UpdateTimerUI();
+
+    void UpdateTimerUI()
+    {
+        if (speedText != null)
+        {
+            speedText.text = $"{Mathf.RoundToInt(forwardSpeed)} mph";
+        }
     }
+
+
+
+}
 
 
 }

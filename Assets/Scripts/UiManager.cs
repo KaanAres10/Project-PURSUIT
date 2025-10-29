@@ -1,48 +1,81 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class UiManager : MonoBehaviour
 {
+    [Header("Heli UI Panels")]
+    public GameObject HeliWinPanel;
+    public GameObject HeliCrashPanel;
+    public GameObject HeliCarEscapedPanel;
 
-    [Header("UI Panels")]
-    public GameObject winPanel;
-    public GameObject crashPanel;
+    [Header("Car UI Panels")]
+    public GameObject CarWinPanel;
+    public GameObject CarCaughtPanel;
+    public GameObject CarHeliCrashedPanel;
 
     private bool gameOver = false;
 
-
-    public void ShowWinUI()
+    void Start()
     {
-        if (gameOver) return; gameOver = true;
-
-        if (winPanel != null)
-        {
-            winPanel.SetActive(true);
-        }
-
-        if (crashPanel != null)
-        {
-            crashPanel.SetActive(false);
-        }
+        HideAllPanels();
     }
 
-
-    public void ShowCrashUI()
+    private void HideAllPanels()
     {
-        if (gameOver) return; gameOver = true;
+        HeliWinPanel?.SetActive(false);
+        HeliCrashPanel?.SetActive(false);
+        HeliCarEscapedPanel?.SetActive(false);
 
-        if (winPanel != null)
-        {
-            winPanel.SetActive(false);
-        }
-
-        if (crashPanel != null)
-        {
-            crashPanel.SetActive(true);
-        }
+        CarWinPanel?.SetActive(false);
+        CarCaughtPanel?.SetActive(false);
+        CarHeliCrashedPanel?.SetActive(false);
     }
 
+    public void ShowHeliWin()
+    {
+        if (gameOver) return;
+        gameOver = true;
+
+        Debug.Log("UIManager: Helicopter Wins");
+        HeliWinPanel?.SetActive(true);
+        CarCaughtPanel?.SetActive(true);
+    }
+
+    public void ShowHeliCrash()
+    {
+        if (gameOver) return;
+        gameOver = true;
+
+        Debug.Log("UIManager: Helicopter Crashed");
+        HeliCrashPanel?.SetActive(true);
+        CarHeliCrashedPanel?.SetActive(true);
+    }
+
+    public void ShowCarEscape()
+    {
+        if (gameOver) return;
+        gameOver = true;
+
+        Debug.Log("UIManager: Car Escaped");
+        HeliCarEscapedPanel?.SetActive(true);
+        CarWinPanel?.SetActive(true);
+    }
+
+    public bool IsGameOver()
+    {
+        return gameOver;
+    }
+
+    public void ResetUI()
+    {
+        gameOver = false;
+        HeliWinPanel?.SetActive(false);
+        HeliCrashPanel?.SetActive(false);
+        HeliCarEscapedPanel?.SetActive(false);
+        CarWinPanel?.SetActive(false);
+        CarCaughtPanel?.SetActive(false);
+        CarHeliCrashedPanel?.SetActive(false);
+
+        GameManager.Instance.ResumeGame();
+    }
 
 }

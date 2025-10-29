@@ -53,13 +53,7 @@ public class DrivingWinTimer : MonoBehaviour
         gameOver = true;
         if (GameManager.Instance.GameIsOver()) return;
 
-        GameManager.Instance.drivingPlayerWon = true;
-        Debug.Log(" Driving Player Wins!");
-
-        if (uiManager != null)
-        {
-            uiManager.ShowWinUI(); // could show a "Driver Wins" screen
-        }
+        GameManager.Instance.CarEscapes();
 
     }
 }

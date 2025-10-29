@@ -4,12 +4,14 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
+    [Header("References")]
+    public UiManager uiManager;
+
+    [Header("Game State")]
     public bool heliPlayerWon = false;
     public bool drivingPlayerWon = false;
-
-    [Header("UI References")]
-    public Canvas heliPlayerUICanvas;     // 2D monitor UI
-    public Canvas drivingPlayerUICanvas;  // VR world-space canvas
+    public bool heliCrashed = false;
+    public bool isPaused = false;
 
     private void Awake()
     {
@@ -22,27 +24,71 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    public void EndGame(bool heliWon)
+    public void HeliWins()
     {
-        if (heliWon)
+        if (uiManager.IsGameOver()) return;
+
+        heliPlayerWon = true;
+        uiManager.ShowHeliWin();
+        PauseGame();
+    }
+
+    public void HeliCrashed()
+    {
+        if (uiManager.IsGameOver()) return;
+
+        heliCrashed = true;
+        uiManager.ShowHeliCrash();
+        PauseGame();
+    }
+
+    public void CarEscapes()
+    {
+        if (uiManager.IsGameOver()) return;
+
+        drivingPlayerWon = true;
+        uiManager.ShowCarEscape();
+        PauseGame();
+    }
+
+    // --- PAUSE/RESUME ---
+    public void PauseGame()
+    {
+        if (isPaused) return;
+
+        isPaused = true;
+
+        // Freeze all rigidbodies safely
+        Rigidbody[] bodies = FindObjectsOfType<Rigidbody>();
+        foreach (var rb in bodies)
         {
-            heliPlayerWon = true;
-        }
-        else
-        {
-            drivingPlayerWon = true;
+            rb.isKinematic = true;
         }
 
-        // Show UIs for both players
-        if (heliPlayerUICanvas != null)
-            heliPlayerUICanvas.gameObject.SetActive(true);
+        // Freeze physics time but keep Update() for UI working
+        Time.timeScale = 0f;
 
-        if (drivingPlayerUICanvas != null)
-            drivingPlayerUICanvas.gameObject.SetActive(true);
+        Debug.Log("GameManager: Game paused.");
+    }
+
+    public void ResumeGame()
+    {
+        if (!isPaused) return;
+
+        isPaused = false;
+        Time.timeScale = 1f;
+
+        Rigidbody[] bodies = FindObjectsOfType<Rigidbody>();
+        foreach (var rb in bodies)
+        {
+            rb.isKinematic = false;
+        }
+
+        Debug.Log("GameManager: Game resumed.");
     }
 
     public bool GameIsOver()
     {
-        return heliPlayerWon || drivingPlayerWon;
+        return uiManager != null && uiManager.IsGameOver();
     }
 }

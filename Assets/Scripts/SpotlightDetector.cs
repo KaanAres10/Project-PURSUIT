@@ -9,7 +9,8 @@ public class SpotlightDetector : MonoBehaviour
     [Header("Setup")]
     public Light spotlight;
     public Transform car;
-    public Image uiFillBar;
+    public Image HeliUIFillBar;
+    public Image CarUIFillBar;
     private Renderer buttonsRenderer;
     private Renderer leatherRenderer;
     private Renderer screenRenderer;
@@ -117,9 +118,14 @@ public class SpotlightDetector : MonoBehaviour
 
         }
 
-        if (uiFillBar != null) 
+        if (HeliUIFillBar != null) 
         {
-            uiFillBar.fillAmount = detectionTimer / requiredTime;
+            HeliUIFillBar.fillAmount = detectionTimer / requiredTime;
+        }
+
+        if (CarUIFillBar != null)
+        {
+            CarUIFillBar.fillAmount = detectionTimer / requiredTime;
         }
 
 
@@ -160,15 +166,11 @@ public class SpotlightDetector : MonoBehaviour
 
     void ProjectorPlayerWins()
     {
-        if (GameManager.Instance.GameIsOver()) return;
+        
+            Debug.Log("Projector Player Wins!");
+            GameManager.Instance.HeliWins();
+        
 
-        Debug.Log("Heli Player Wins!");
-        GameManager.Instance.heliPlayerWon = true;
-
-        if (uiManager != null)
-        {
-            uiManager.ShowWinUI();  // could be a "Heli Wins" screen
-        }
     }
 
 
