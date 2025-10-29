@@ -33,6 +33,11 @@ public class SteeringMechanics : MonoBehaviour
     private Transform yAxisLockObj;
     private float fixedY; // to remember the Y
 
+    [Header("Audio Settings")]
+    public AudioSource engineAudio;
+    public float minPitch = 0.8f;
+    public float maxPitch = 2.0f;
+
 
     [Header("Steering wheel asset")]
     public Transform steeringWheelTransform;
@@ -67,6 +72,9 @@ public class SteeringMechanics : MonoBehaviour
         {
             initialSteeringWheelRotation = steeringWheelTransform.localRotation;
         }
+
+        if (engineAudio == null)
+            engineAudio = GetComponent<AudioSource>();
     }
 
     void FixedUpdate()
@@ -164,7 +172,7 @@ public class SteeringMechanics : MonoBehaviour
             
 
         }
-
+        UpdateEngineSound(speedFactor);
         UpdateTimerUI();
 
     void UpdateTimerUI()
@@ -175,9 +183,16 @@ public class SteeringMechanics : MonoBehaviour
         }
     }
 
+    void UpdateEngineSound(float speedFactor)
+    {
+        if (engineAudio != null)
+        {
+            engineAudio.pitch = Mathf.Lerp(minPitch, maxPitch, speedFactor);
+        }
+    }
 
 
-}
+    }
 
 
 }
