@@ -21,7 +21,7 @@ public class RadarScript : MonoBehaviour
     void Start()
     {
         // Find the player
-        player = GameObject.Find("Sports Car 2")?.transform;
+        player = GameObject.FindWithTag("Car")?.transform;
         if (player == null) Debug.LogError("Sports Car not found!");
 
         // Find the helicopter's tracker
@@ -59,6 +59,6 @@ public class RadarScript : MonoBehaviour
 
         // Show in UI 
         if (distanceText != null)
-            distanceText.text = $" {offset2D.magnitude / 10.0f:F1} m";
+            distanceText.text = $" {offset2D.magnitude:F1} m";
     }
 }
