@@ -14,6 +14,13 @@ The game merges **virtual and physical worlds**, projecting live visuals into re
 
 ---
 
+## Video
+<video muted loop playsinline controls style="width:100%; height:auto; border-radius:8px;">
+  <source src="https://github.com/user-attachments/assets/1abfa2cb-0950-45c6-86e7-18bad82fd586" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+---
+
 ## Core Features
 
 ### Dual-Player Gameplay
