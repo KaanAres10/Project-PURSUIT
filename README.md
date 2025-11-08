@@ -17,8 +17,10 @@ The game merges **virtual and physical worlds**, projecting live visuals into re
 ## Core Features
 
 ### Dual-Player Gameplay
-- **Driver (VR):** Immersed in a car cockpit through the HTC Vive headset.  
+- **Driver (VR):** Immersed in a car cockpit through the HTC Vive headset.
+
 - **Helicopter Operator:** Walks physically, using a **Vive Tracker**-attached **projector** to “scan” the room.
+![Projector with Tracker](projector_tracker.jpg)
 
 ### Custom Volumetric Fog 
 Implemented with Unity’s **URP Render Feature**
@@ -28,6 +30,8 @@ The **Volumetric Fog** combines **baked lighting** and **raymarching** to simula
 2. This lighting information is stored inside a **3D texture** (the *Baked Light Volume*), representing the ambient and directional illumination at each voxel in world space.  
 3. At runtime, the fog shader **raymarches** through this volume, sampling the precomputed lighting values while accumulating **scattering** and **transmittance** along the camera ray.  
 4. The result is a volumetric fog that reacts to light depth and color, and it remains efficient for **real-time VR rendering**.
+![Volumetric Fog](Volumetric_Fog.png)
+
 
 ### Virtual Projection Mapping
 - Real-time **projection alignment** with physical tracking.  
@@ -46,10 +50,10 @@ The **Volumetric Fog** combines **baked lighting** and **raymarching** to simula
 | Component | Role |
 |------------|------|
 | PC | Runs Unity (VR, projector rendering). |
-| HTC Vive Headset | Main VR experience for the driver. |
-| HTC Vive Tracker | Tracks projector’s position/orientation. |
-| Acer Projector | Projects the helicopter spotlight onto real surfaces. |
-| Steering Wheel | Provides physical driving control. |
+| HTC Vive Headset | Main VR experience for the driver. | ![HTC Vive Headset](vive.png) |
+| HTC Vive Tracker | Tracks projector’s position/orientation. | ![Vive Tracker](tracker.png) |
+| Acer Projector | Projects the helicopter spotlight onto real surfaces. |![Projector](projector.png) |
+| Steering Wheel | Provides physical driving control. | ![Steering Wheel](steer.png) |
 | Base Stations | Enable accurate spatial tracking. |
 
 ---
