@@ -14,6 +14,11 @@ The game merges **virtual and physical worlds**, projecting live visuals into re
 
 ---
 
+## Video
+[https://github.com/user-attachments/assets/1abfa2cb-0950-45c6-86e7-18bad82fd586](https://github.com/user-attachments/assets/1abfa2cb-0950-45c6-86e7-18bad82fd586)
+
+---
+
 ## Core Features
 
 ### Dual-Player Gameplay
@@ -59,5 +64,7 @@ The **Volumetric Fog** combines **baked lighting** and **raymarching** to simula
 
 **Technologies:** Unity URP, SteamVR, HLSL  
 **Hardware:** HTC Vive, Vive Tracker, Acer Projector, Logitech Steering Wheel  
-
+---
+## BTS
+[https://github.com/user-attachments/assets/7fa8ed8e-74ae-4a9c-ba31-6f6ea94fd514](https://github.com/user-attachments/assets/7fa8ed8e-74ae-4a9c-ba31-6f6ea94fd514)
 
