@@ -51,16 +51,50 @@ The **Volumetric Fog** combines **baked lighting** and **raymarching** to simula
 
 ---
 
-## Hardware Setup
+<h2 id="hardware-setup">Hardware Setup</h2>
 
-| Component | Role | Image |
-|------------|------|-------|
-| **PC** | Runs Unity (VR and projector rendering). |  |
-| **HTC Vive Headset** | Main VR experience for the driver. | <img src="https://media.githubusercontent.com/media/KaanAres10/Project-PURSUIT/web/media/vive.png" width="100"/> |
-| **HTC Vive Tracker** | Tracks projector’s position/orientation. | <img src="https://media.githubusercontent.com/media/KaanAres10/Project-PURSUIT/web/media/tracker.png" width="100"/> |
-| **Acer Projector** | Projects the helicopter spotlight onto real surfaces. | <img src="https://media.githubusercontent.com/media/KaanAres10/Project-PURSUIT/web/media/projector.png" width="100"/> |
-| **Steering Wheel** | Provides physical driving control. | <img src="https://media.githubusercontent.com/media/KaanAres10/Project-PURSUIT/web/media/steer.png" width="100"/> |
-| **Base Stations** | Enable accurate spatial tracking. |  |
+<table>
+  <thead>
+    <tr>
+      <th>Component</th>
+      <th>Role</th>
+      <th>Image</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>PC</strong></td>
+      <td>Runs Unity (VR and projector rendering).</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><strong>HTC Vive Headset</strong></td>
+      <td>Main VR experience for the driver.</td>
+      <td><img src="https://media.githubusercontent.com/media/KaanAres10/Project-PURSUIT/web/media/vive.png" width="120" alt="HTC Vive Headset"></td>
+    </tr>
+    <tr>
+      <td><strong>HTC Vive Tracker</strong></td>
+      <td>Tracks projector’s position/orientation.</td>
+      <td><img src="https://media.githubusercontent.com/media/KaanAres10/Project-PURSUIT/web/media/tracker.png" width="120" alt="Vive Tracker"></td>
+    </tr>
+    <tr>
+      <td><strong>Acer Projector</strong></td>
+      <td>Projects the helicopter spotlight onto real surfaces.</td>
+      <td><img src="https://media.githubusercontent.com/media/KaanAres10/Project-PURSUIT/web/media/projector.png" width="120" alt="Projector"></td>
+    </tr>
+    <tr>
+      <td><strong>Steering Wheel</strong></td>
+      <td>Provides physical driving control.</td>
+      <td><img src="https://media.githubusercontent.com/media/KaanAres10/Project-PURSUIT/web/media/steer.png" width="120" alt="Steering Wheel"></td>
+    </tr>
+    <tr>
+      <td><strong>Base Stations</strong></td>
+      <td>Enable accurate spatial tracking.</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
 ---
 
 **Technologies:** Unity URP, SteamVR, HLSL  
