@@ -1,4 +1,3 @@
-# Project Pursuit  
 *An mixed-reality experience combining VR and real world projection.*
 
 ---
