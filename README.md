@@ -5,10 +5,10 @@
 
 ## Concept
 
-**Project Pursuit** is an immersive **two-player mixed-reality car chase** experience.
+**Project Pursuit** is an immersive **two player mixed-reality car chase** experience.
 
-- **Player 1 – The Driver** sits inside a **futuristic car** wearing an **HTC Vive headset**, using a **physical steering wheel** to escape a pursuing helicopter.  
-- **Player 2 – The Helicopter Operator** walks around the room with a **tracked projector**, searching the environment from above.
+- **Player 1: The Driver** sits inside a car wearing an HTC Vive headset, using a physical steering wheel to escape a pursuing helicopter.  
+- **Player 2: The Helicopter Operator** walks around the room with a **projector with tracker attached**, searching the environment from above.
 
 The game merges **virtual and physical worlds**, projecting live visuals into real space.
 
@@ -31,10 +31,10 @@ The game merges **virtual and physical worlds**, projecting live visuals into re
 Implemented with Unity’s **URP Render Feature**
 
 The **Volumetric Fog** combines **baked lighting** and **raymarching** to simulate light scattering inside fog volumes.
-1. During baking, lighting data is sampled from **Unity’s Light Probes** using **spherical harmonics (SH)** evaluation.  
-2. This lighting information is stored inside a **3D texture** (the *Baked Light Volume*), representing the ambient and directional illumination at each voxel in world space.  
-3. At runtime, the fog shader **raymarches** through this volume, sampling the precomputed lighting values while accumulating **scattering** and **transmittance** along the camera ray.  
-4. The result is a volumetric fog that reacts to light depth and color, and it remains efficient for **real-time VR rendering**.
+1. During baking, lighting data is sampled from Light Probes using **spherical harmonics (SH)** evaluation.  
+2. This lighting information is stored inside a 3D texture (the *Baked Light Volume*), representing the ambient and directional illumination at each voxel in world space.  
+3. At runtime, the fog shader raymarches through this volume, sampling the precomputed lighting values while accumulating  scattering and transmittance along the camera ray.  
+4. The result is a volumetric fog that reacts to light depth and color, and it remains efficient for real-time VR rendering.
 
 ![Volumetric Fog](media/Volumetric_Fog.png)
 
