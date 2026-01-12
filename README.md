@@ -70,3 +70,10 @@ The **Volumetric Fog** combines **baked lighting** and **raymarching** to simula
 ## BTS
 [https://github.com/user-attachments/assets/7fa8ed8e-74ae-4a9c-ba31-6f6ea94fd514](https://github.com/user-attachments/assets/7fa8ed8e-74ae-4a9c-ba31-6f6ea94fd514)
 
+---
+## Authors
+- Alexander Gemal
+- Kaan Altıntaş
+- Ludwig Estling
+- Emmy Klum
+- Benjamin Schmidt
